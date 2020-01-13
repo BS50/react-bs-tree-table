@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 // import ExampleComponent from 'react-bs-tree-table'
 import {ExampleComponent1, ExampleComponent, Table} from 'react-bs-tree-table'
 import {renderYearCell, yearFilterFunc} from './TableRenderers'
-import {firstColumnStyle} from './TableStyles'
+import {firstColumnStyle, defaultCellStyle} from './TableStyles'
 
 export default class App extends Component {
     getTreeData() {
@@ -70,6 +70,7 @@ export default class App extends Component {
                     }
                 }
             ],
+            defaultCellStyle: defaultCellStyle,
             entryPoints: [
                 0, 1
             ],

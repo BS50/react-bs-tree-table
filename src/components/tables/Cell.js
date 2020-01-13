@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-import {getStyle, renderCell} from './Style'
+import {getCellStyle, renderCell} from './Style'
 import C from './C'
 
 class Cell extends Component {
@@ -43,7 +43,7 @@ class Cell extends Component {
             isCellWithGroupButton = true
         }
         if (cellInfo !== undefined) {
-            var style = getStyle(cellInfo.style, this.props)
+            var style = getCellStyle(this.props.tableData.defaultCellStyle, cellInfo.style, this.props)
 
             if (this.props.columnInfo.grouped === true) {
                 var padding = rowData['level'] * C.LEVEL_PX_STEP
@@ -56,7 +56,7 @@ class Cell extends Component {
             }
         }
 
-        return <td style={getStyle(this.props.tableData.defaultCellStyle, this.props)} />
+        return <td style={getCellStyle(this.props.tableData.defaultCellStyle, undefined, this.props)} />
     }
 }
 

@@ -130,6 +130,16 @@ var getStyle = function getStyle(styleFunc, props) {
     return {};
 };
 
+var getCellStyle = function getCellStyle(defaultStyleFunc, cellStyleFunc, props) {
+    if (cellStyleFunc !== undefined) {
+        return cellStyleFunc(props);
+    } else if (defaultStyleFunc !== undefined) {
+        return defaultStyleFunc(props);
+    } else {
+        return {};
+    }
+};
+
 var renderHeaderCell = function renderHeaderCell(renderFunc, tableData, headerInfo) {
     if (renderFunc) {
         return renderFunc(tableData, headerInfo);
@@ -1806,7 +1816,7 @@ var Cell = function (_Component) {
                 isCellWithGroupButton = true;
             }
             if (cellInfo !== undefined) {
-                var style = getStyle(cellInfo.style, this.props);
+                var style = getCellStyle(this.props.tableData.defaultCellStyle, cellInfo.style, this.props);
 
                 if (this.props.columnInfo.grouped === true) {
                     var padding = rowData['level'] * C.LEVEL_PX_STEP;
@@ -1828,7 +1838,7 @@ var Cell = function (_Component) {
                 }
             }
 
-            return React.createElement('td', { style: getStyle(this.props.tableData.defaultCellStyle, this.props) });
+            return React.createElement('td', { style: getCellStyle(this.props.tableData.defaultCellStyle, undefined, this.props) });
         }
     }]);
     return Cell;

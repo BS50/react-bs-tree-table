@@ -6,6 +6,17 @@ export const getStyle = (styleFunc, props) => {
     }
 }
 
+export const getCellStyle = (defaultStyleFunc, cellStyleFunc, props) => {
+    if (cellStyleFunc !== undefined) {
+        return cellStyleFunc(props)
+    } else if (defaultStyleFunc !== undefined) {
+        return defaultStyleFunc(props)
+    } else {
+        return {
+        }
+    }
+}
+
 export const renderHeaderCell = (renderFunc, tableData, headerInfo) => {
     if (renderFunc) {
         return renderFunc(tableData, headerInfo)
