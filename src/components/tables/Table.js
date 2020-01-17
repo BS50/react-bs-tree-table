@@ -161,7 +161,7 @@ class Table extends Component {
                 if (cellInfo.filterFunc === undefined) {
                     cellValues = [{value: cellInfo.value, renderedValue: cellInfo.value}]
                 } else {
-                    cellValues = cellInfo.filterFunc(cellInfo)
+                    cellValues = cellInfo.filterFunc(this.props.tableData, rowId, columnId)
                 }
                 cellValues.map((cellValue) => {
                     cellValue.rowId = rowId

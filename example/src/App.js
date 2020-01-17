@@ -165,8 +165,8 @@ export default class App extends Component {
     }
 
     render () {
-        var tableData = this.getTreeData()
-        // var tableData = this.getSimpleData()
+        // var tableData = this.getTreeData()
+        var tableData = this.getSimpleData()
 
         return (
             <div>

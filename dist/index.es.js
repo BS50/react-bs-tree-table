@@ -2612,7 +2612,7 @@ var Table$1 = function (_Component) {
                     if (cellInfo.filterFunc === undefined) {
                         cellValues = [{ value: cellInfo.value, renderedValue: cellInfo.value }];
                     } else {
-                        cellValues = cellInfo.filterFunc(cellInfo);
+                        cellValues = cellInfo.filterFunc(_this.props.tableData, rowId, columnId);
                     }
                     cellValues.map(function (cellValue) {
                         cellValue.rowId = rowId;
