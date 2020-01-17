@@ -7,6 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
+var reactDom = require('react-dom');
 
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
@@ -1626,6 +1627,11 @@ var faChevronRight = {
   iconName: 'chevron-right',
   icon: [320, 512, [], "f054", "M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"]
 };
+var faColumns = {
+  prefix: 'fas',
+  iconName: 'columns',
+  icon: [512, 512, [], "f0db", "M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64V160h160v256zm224 0H288V160h160v256z"]
+};
 var faFilter = {
   prefix: 'fas',
   iconName: 'filter',
@@ -1729,18 +1735,19 @@ var HeaderRow = function (_Component) {
 
             var columns = this.props.tableData.columns;
             if (columns !== undefined) {
-                var headers = columns.map(function (headerInfo) {
-                    var isColumnHidden = headerInfo.columnHidden;
-                    if (isColumnHidden) {
-                        return React__default.createElement(React__default.Fragment, { key: headerInfo.field });
+                var headers = columns.map(function (columnInfo) {
+                    var columnVisibilityData = _this2.props.columnVisibility.data[columnInfo.field];
+                    if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
+                        return React__default.createElement(HeaderCell, {
+                            key: columnInfo.field,
+                            tableData: _this2.props.tableData,
+                            toggleFilter: _this2.toggleFilter,
+                            info: columnInfo,
+                            columnFilter: _this2.props.columnFilter[columnInfo.field]
+                        });
+                    } else {
+                        return React__default.createElement(React__default.Fragment, { key: columnInfo.field });
                     }
-                    return React__default.createElement(HeaderCell, {
-                        key: headerInfo.field,
-                        tableData: _this2.props.tableData,
-                        toggleFilter: _this2.toggleFilter,
-                        info: headerInfo,
-                        columnFilter: _this2.props.columnFilter[headerInfo.field]
-                    });
                 });
                 return React__default.createElement(
                     'thead',
@@ -1761,6 +1768,7 @@ var HeaderRow = function (_Component) {
 
 HeaderRow.propTypes = {
     tableData: PropTypes.object.isRequired,
+    columnVisibility: PropTypes.object.isRequired,
     columnFilter: PropTypes.object.isRequired,
     toggleFilter: PropTypes.func.isRequired
 };
@@ -1875,15 +1883,16 @@ var Row = function (_Component) {
         return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = Row.__proto__ || Object.getPrototypeOf(Row)).call.apply(_ref, [this].concat(args))), _this), _this.getRow = function () {
             var rowData = _this.props.tableData.data[_this.props.rowDataId];
             var row = _this.props.tableData.columns.map(function (columnInfo) {
-                if (columnInfo.columnHidden) {
-                    return React__default.createElement(React__default.Fragment, { key: columnInfo.field });
-                } else {
+                var columnVisibilityData = _this.props.columnVisibility.data[columnInfo.field];
+                if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                     return React__default.createElement(Cell, { key: columnInfo.field,
                         tableData: _this.props.tableData,
                         rowDataId: _this.props.rowDataId,
                         columnInfo: columnInfo,
                         triggerRow: _this.props.triggerRow
                     });
+                } else {
+                    return React__default.createElement(React__default.Fragment, { key: columnInfo.field });
                 }
             });
             if (_this.props.filteredRowIdList.includes(_this.props.rowDataId.toString())) {
@@ -1917,7 +1926,8 @@ var Row = function (_Component) {
                             rowDataId: childRowId,
                             tableData: _this2.props.tableData,
                             filteredRowIdList: _this2.props.filteredRowIdList,
-                            triggerRow: _this2.props.triggerRow });
+                            triggerRow: _this2.props.triggerRow,
+                            columnVisibility: _this2.props.columnVisibility });
                     }));
                 }
 
@@ -1933,6 +1943,7 @@ var Row = function (_Component) {
 Row.propTypes = {
     tableData: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
+    columnVisibility: PropTypes.object.isRequired,
     filteredRowIdList: PropTypes.array.isRequired,
     rowDataId: PropTypes.number.isRequired
 };
@@ -2034,6 +2045,479 @@ ColumnFilter.propTypes = {
 
 var css$2 = ".Table_filterButton__JvbUD {\n    float: right;\n}\n\n.Table_transparentButton__2DCOH {\n    background-color: Transparent;\n    background-repeat:no-repeat;\n    border: none;\n}\n\n.Table_active-filter__1pKvs {\n    color: #009f13;\n}\n.Table_table-container__Td0Zr {\n    position: static;\n}";
 styleInject(css$2);
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+function _objectWithoutProperties$1(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
+/**
+ * Check whether some DOM node is our Component's node.
+ */
+function isNodeFound(current, componentNode, ignoreClass) {
+  if (current === componentNode) {
+    return true;
+  } // SVG <use/> elements do not technically reside in the rendered DOM, so
+  // they do not have classList directly, but they offer a link to their
+  // corresponding element, which can have classList. This extra check is for
+  // that case.
+  // See: http://www.w3.org/TR/SVG11/struct.html#InterfaceSVGUseElement
+  // Discussion: https://github.com/Pomax/react-onclickoutside/pull/17
+
+
+  if (current.correspondingElement) {
+    return current.correspondingElement.classList.contains(ignoreClass);
+  }
+
+  return current.classList.contains(ignoreClass);
+}
+/**
+ * Try to find our node in a hierarchy of nodes, returning the document
+ * node as highest node if our node is not found in the path up.
+ */
+
+function findHighest(current, componentNode, ignoreClass) {
+  if (current === componentNode) {
+    return true;
+  } // If source=local then this event came from 'somewhere'
+  // inside and should be ignored. We could handle this with
+  // a layered approach, too, but that requires going back to
+  // thinking in terms of Dom node nesting, running counter
+  // to React's 'you shouldn't care about the DOM' philosophy.
+
+
+  while (current.parentNode) {
+    if (isNodeFound(current, componentNode, ignoreClass)) {
+      return true;
+    }
+
+    current = current.parentNode;
+  }
+
+  return current;
+}
+/**
+ * Check if the browser scrollbar was clicked
+ */
+
+function clickedScrollbar(evt) {
+  return document.documentElement.clientWidth <= evt.clientX || document.documentElement.clientHeight <= evt.clientY;
+}
+
+// ideally will get replaced with external dep
+// when rafrex/detect-passive-events#4 and rafrex/detect-passive-events#5 get merged in
+var testPassiveEventSupport = function testPassiveEventSupport() {
+  if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') {
+    return;
+  }
+
+  var passive = false;
+  var options = Object.defineProperty({}, 'passive', {
+    get: function get() {
+      passive = true;
+    }
+  });
+
+  var noop = function noop() {};
+
+  window.addEventListener('testPassiveEventSupport', noop, options);
+  window.removeEventListener('testPassiveEventSupport', noop, options);
+  return passive;
+};
+
+function autoInc(seed) {
+  if (seed === void 0) {
+    seed = 0;
+  }
+
+  return function () {
+    return ++seed;
+  };
+}
+
+var uid = autoInc();
+
+var passiveEventSupport;
+var handlersMap = {};
+var enabledInstances = {};
+var touchEvents = ['touchstart', 'touchmove'];
+var IGNORE_CLASS_NAME = 'ignore-react-onclickoutside';
+/**
+ * Options for addEventHandler and removeEventHandler
+ */
+
+function getEventHandlerOptions(instance, eventName) {
+  var handlerOptions = null;
+  var isTouchEvent = touchEvents.indexOf(eventName) !== -1;
+
+  if (isTouchEvent && passiveEventSupport) {
+    handlerOptions = {
+      passive: !instance.props.preventDefault
+    };
+  }
+
+  return handlerOptions;
+}
+/**
+ * This function generates the HOC function that you'll use
+ * in order to impart onOutsideClick listening to an
+ * arbitrary component. It gets called at the end of the
+ * bootstrapping code to yield an instance of the
+ * onClickOutsideHOC function defined inside setupHOC().
+ */
+
+
+function onClickOutsideHOC(WrappedComponent, config) {
+  var _class, _temp;
+
+  var componentName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  return _temp = _class =
+  /*#__PURE__*/
+  function (_Component) {
+    _inheritsLoose(onClickOutside, _Component);
+
+    function onClickOutside(props) {
+      var _this;
+
+      _this = _Component.call(this, props) || this;
+
+      _this.__outsideClickHandler = function (event) {
+        if (typeof _this.__clickOutsideHandlerProp === 'function') {
+          _this.__clickOutsideHandlerProp(event);
+
+          return;
+        }
+
+        var instance = _this.getInstance();
+
+        if (typeof instance.props.handleClickOutside === 'function') {
+          instance.props.handleClickOutside(event);
+          return;
+        }
+
+        if (typeof instance.handleClickOutside === 'function') {
+          instance.handleClickOutside(event);
+          return;
+        }
+
+        throw new Error("WrappedComponent: " + componentName + " lacks a handleClickOutside(event) function for processing outside click events.");
+      };
+
+      _this.__getComponentNode = function () {
+        var instance = _this.getInstance();
+
+        if (config && typeof config.setClickOutsideRef === 'function') {
+          return config.setClickOutsideRef()(instance);
+        }
+
+        if (typeof instance.setClickOutsideRef === 'function') {
+          return instance.setClickOutsideRef();
+        }
+
+        return reactDom.findDOMNode(instance);
+      };
+
+      _this.enableOnClickOutside = function () {
+        if (typeof document === 'undefined' || enabledInstances[_this._uid]) {
+          return;
+        }
+
+        if (typeof passiveEventSupport === 'undefined') {
+          passiveEventSupport = testPassiveEventSupport();
+        }
+
+        enabledInstances[_this._uid] = true;
+        var events = _this.props.eventTypes;
+
+        if (!events.forEach) {
+          events = [events];
+        }
+
+        handlersMap[_this._uid] = function (event) {
+          if (_this.componentNode === null) return;
+
+          if (_this.props.preventDefault) {
+            event.preventDefault();
+          }
+
+          if (_this.props.stopPropagation) {
+            event.stopPropagation();
+          }
+
+          if (_this.props.excludeScrollbar && clickedScrollbar(event)) return;
+          var current = event.target;
+
+          if (findHighest(current, _this.componentNode, _this.props.outsideClickIgnoreClass) !== document) {
+            return;
+          }
+
+          _this.__outsideClickHandler(event);
+        };
+
+        events.forEach(function (eventName) {
+          document.addEventListener(eventName, handlersMap[_this._uid], getEventHandlerOptions(_this, eventName));
+        });
+      };
+
+      _this.disableOnClickOutside = function () {
+        delete enabledInstances[_this._uid];
+        var fn = handlersMap[_this._uid];
+
+        if (fn && typeof document !== 'undefined') {
+          var events = _this.props.eventTypes;
+
+          if (!events.forEach) {
+            events = [events];
+          }
+
+          events.forEach(function (eventName) {
+            return document.removeEventListener(eventName, fn, getEventHandlerOptions(_this, eventName));
+          });
+          delete handlersMap[_this._uid];
+        }
+      };
+
+      _this.getRef = function (ref) {
+        return _this.instanceRef = ref;
+      };
+
+      _this._uid = uid();
+      return _this;
+    }
+    /**
+     * Access the WrappedComponent's instance.
+     */
+
+
+    var _proto = onClickOutside.prototype;
+
+    _proto.getInstance = function getInstance() {
+      if (!WrappedComponent.prototype.isReactComponent) {
+        return this;
+      }
+
+      var ref = this.instanceRef;
+      return ref.getInstance ? ref.getInstance() : ref;
+    };
+
+    /**
+     * Add click listeners to the current document,
+     * linked to this component's state.
+     */
+    _proto.componentDidMount = function componentDidMount() {
+      // If we are in an environment without a DOM such
+      // as shallow rendering or snapshots then we exit
+      // early to prevent any unhandled errors being thrown.
+      if (typeof document === 'undefined' || !document.createElement) {
+        return;
+      }
+
+      var instance = this.getInstance();
+
+      if (config && typeof config.handleClickOutside === 'function') {
+        this.__clickOutsideHandlerProp = config.handleClickOutside(instance);
+
+        if (typeof this.__clickOutsideHandlerProp !== 'function') {
+          throw new Error("WrappedComponent: " + componentName + " lacks a function for processing outside click events specified by the handleClickOutside config option.");
+        }
+      }
+
+      this.componentNode = this.__getComponentNode(); // return early so we dont initiate onClickOutside
+
+      if (this.props.disableOnClickOutside) return;
+      this.enableOnClickOutside();
+    };
+
+    _proto.componentDidUpdate = function componentDidUpdate() {
+      this.componentNode = this.__getComponentNode();
+    };
+    /**
+     * Remove all document's event listeners for this component
+     */
+
+
+    _proto.componentWillUnmount = function componentWillUnmount() {
+      this.disableOnClickOutside();
+    };
+    /**
+     * Can be called to explicitly enable event listening
+     * for clicks and touches outside of this element.
+     */
+
+
+    /**
+     * Pass-through render
+     */
+    _proto.render = function render() {
+      // eslint-disable-next-line no-unused-vars
+      var _props = this.props,
+          excludeScrollbar = _props.excludeScrollbar,
+          props = _objectWithoutProperties$1(_props, ["excludeScrollbar"]);
+
+      if (WrappedComponent.prototype.isReactComponent) {
+        props.ref = this.getRef;
+      } else {
+        props.wrappedRef = this.getRef;
+      }
+
+      props.disableOnClickOutside = this.disableOnClickOutside;
+      props.enableOnClickOutside = this.enableOnClickOutside;
+      return React.createElement(WrappedComponent, props);
+    };
+
+    return onClickOutside;
+  }(React.Component), _class.displayName = "OnClickOutside(" + componentName + ")", _class.defaultProps = {
+    eventTypes: ['mousedown', 'touchstart'],
+    excludeScrollbar: config && config.excludeScrollbar || false,
+    outsideClickIgnoreClass: IGNORE_CLASS_NAME,
+    preventDefault: false,
+    stopPropagation: false
+  }, _class.getClass = function () {
+    return WrappedComponent.getClass ? WrappedComponent.getClass() : WrappedComponent;
+  }, _temp;
+}
+
+var ColumnVisibility = function (_Component) {
+    inherits(ColumnVisibility, _Component);
+
+    function ColumnVisibility() {
+        var _ref;
+
+        var _temp, _this, _ret;
+
+        classCallCheck(this, ColumnVisibility);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = ColumnVisibility.__proto__ || Object.getPrototypeOf(ColumnVisibility)).call.apply(_ref, [this].concat(args))), _this), _this.getStyle = function (left, top) {
+            return {
+                left: left,
+                top: top,
+                display: 'inline',
+                position: 'fixed',
+                zIndex: '12000',
+                borderRadius: '5px',
+                backgroundColor: 'lightgrey',
+                padding: '3px'
+            };
+        }, _temp), possibleConstructorReturn(_this, _ret);
+    }
+
+    createClass(ColumnVisibility, [{
+        key: 'handleClickOutside',
+        value: function handleClickOutside() {
+            this.props.hideColumnVisibility();
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            if (this.props.columnVisibility.isActive) {
+                var values = this.props.tableData.columns.map(function (columnInfo) {
+                    var isHidden = _this2.props.columnVisibility.data[columnInfo.field].isHidden;
+                    return React__default.createElement(
+                        React__default.Fragment,
+                        { key: columnInfo.field },
+                        React__default.createElement('input', {
+                            type: 'checkbox',
+                            checked: !isHidden,
+                            value: !isHidden,
+                            onChange: function onChange() {
+                                _this2.props.columnVisibility.data[columnInfo.field].isHidden = !isHidden;
+                            }
+                        }),
+                        columnInfo.title,
+                        React__default.createElement('br', null)
+                    );
+                });
+                return React__default.createElement(
+                    'div',
+                    { style: this.getStyle(this.props.columnVisibility.mouseX.toString() + 'px', this.props.columnVisibility.mouseY.toString() + 'px') },
+                    values
+                );
+            } else {
+                return React__default.createElement(React__default.Fragment, null);
+            }
+        }
+    }]);
+    return ColumnVisibility;
+}(React.Component);
+
+ColumnVisibility.propTypes = {
+    tableData: PropTypes.object.isRequired,
+    columnVisibility: PropTypes.object.isRequired,
+    hideColumnVisibility: PropTypes.func.isRequired
+};
+
+var ColumnVisibility$1 = onClickOutsideHOC(ColumnVisibility);
+
+var MenuBar = function (_Component) {
+    inherits(MenuBar, _Component);
+
+    function MenuBar() {
+        classCallCheck(this, MenuBar);
+        return possibleConstructorReturn(this, (MenuBar.__proto__ || Object.getPrototypeOf(MenuBar)).apply(this, arguments));
+    }
+
+    createClass(MenuBar, [{
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            var ret = React__default.createElement(React__default.Fragment, null);
+            if (this.props.tableData.columnVisibility) {
+                ret = React__default.createElement(
+                    'div',
+                    null,
+                    React__default.createElement(
+                        'button',
+                        { className: styles.transparentButton, onClick: function onClick(e) {
+                                _this2.props.toogleColumnVisibilityContainer(e.pageX, e.pageY);
+                            } },
+                        React__default.createElement(FontAwesomeIcon, { icon: faColumns })
+                    )
+                );
+            }
+            return ret;
+        }
+    }]);
+    return MenuBar;
+}(React.Component);
+
+MenuBar.propTypes = {
+    tableData: PropTypes.object.isRequired,
+    toogleColumnVisibilityContainer: PropTypes.func.isRequired
+};
 
 var Table$1 = function (_Component) {
     inherits(Table, _Component);
@@ -2213,9 +2697,23 @@ var Table$1 = function (_Component) {
             _this.setState(newState);
         };
 
+        _this.toogleColumnVisibilityContainer = function (x, y) {
+            _this.state.columnVisibility.isActive = !_this.state.columnVisibility.isActive;
+            _this.state.columnVisibility.mouseX = x;
+            _this.state.columnVisibility.mouseY = y;
+        };
+
+        _this.hideColumnVisibility = function () {
+            _this.state.columnVisibility.isActive = false;
+        };
+
         _this.state = {
             columnInfoHidden: true,
             columnFilter: {},
+            columnVisibility: {
+                isActive: false,
+                data: {}
+            },
             filteredRowIdList: []
         };
         return _this;
@@ -2238,6 +2736,7 @@ var Table$1 = function (_Component) {
                     filteredValues: [],
                     filteredRows: []
                 };
+                _this2.state.columnVisibility.data[columnInfo.field] = { isHidden: false };
             });
 
             var currentFilteredIdList = Object.keys(nextProps.tableData.data).map(function (rowId) {
@@ -2306,7 +2805,7 @@ var Table$1 = function (_Component) {
                 });
                 var tbody = entryPointsList.map(function (id) {
                     var rowData = tableData.data[id];
-                    return React__default.createElement(Row, { key: rowData.id, rowDataId: rowData.id, tableData: tableData, filteredRowIdList: _this4.state.filteredRowIdList, triggerRow: _this4.triggerRow });
+                    return React__default.createElement(Row, { key: rowData.id, rowDataId: rowData.id, tableData: tableData, filteredRowIdList: _this4.state.filteredRowIdList, triggerRow: _this4.triggerRow, columnVisibility: _this4.state.columnVisibility });
                 });
 
                 idList.map(function (id) {
@@ -2325,16 +2824,20 @@ var Table$1 = function (_Component) {
                     });
                 });
 
+                var columnVisibilityContainer = React__default.createElement(ColumnVisibility$1, { tableData: tableData, columnVisibility: this.state.columnVisibility, hideColumnVisibility: this.hideColumnVisibility });
+
                 return React__default.createElement(
                     'div',
                     { className: styles.tableContainer, onClick: function onClick(e) {
                             _this4.onClickInTable(e);
                         } },
                     columnFilters,
+                    columnVisibilityContainer,
+                    React__default.createElement(MenuBar, { tableData: tableData, toogleColumnVisibilityContainer: this.toogleColumnVisibilityContainer }),
                     React__default.createElement(
                         'table',
                         { style: getStyle(tableData.style, this.props) },
-                        React__default.createElement(HeaderRow, { tableData: tableData, toggleFilter: this.toggleFilter, columnFilter: this.state.columnFilter }),
+                        React__default.createElement(HeaderRow, { tableData: tableData, toggleFilter: this.toggleFilter, columnFilter: this.state.columnFilter, columnVisibility: this.state.columnVisibility }),
                         React__default.createElement(
                             'tbody',
                             null,

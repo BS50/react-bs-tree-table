@@ -6,6 +6,8 @@ import {getStyle} from './Style'
 import ColumnFilter from './ColumnFilter'
 import './Table.css'
 import styles from '../../styles.css'
+import MenuBar from './MenuBar'
+import ColumnVisibility from './ColumnVisibility'
 
 class Table extends Component {
     constructor(props) {
@@ -13,6 +15,10 @@ class Table extends Component {
         this.state = {
             columnInfoHidden: true,
             columnFilter: {
+            },
+            columnVisibility: {
+                isActive: false,
+                data: {}
             },
             filteredRowIdList: []
         }
@@ -30,6 +36,7 @@ class Table extends Component {
                 filteredValues: [],
                 filteredRows: []
             }
+            this.state.columnVisibility.data[columnInfo.field] = {isHidden: false}
         })
 
         var currentFilteredIdList = Object.keys(nextProps.tableData.data).map((rowId) => {
@@ -232,6 +239,16 @@ class Table extends Component {
         this.setState(newState)
     }
 
+    toogleColumnVisibilityContainer = (x, y) => {
+        this.state.columnVisibility.isActive = !this.state.columnVisibility.isActive
+        this.state.columnVisibility.mouseX = x
+        this.state.columnVisibility.mouseY = y
+    }
+
+    hideColumnVisibility = () => {
+        this.state.columnVisibility.isActive = false
+    }
+
     render() {
         var tableData = {...this.props.tableData}
         if (tableData.data !== undefined) {
@@ -256,7 +273,7 @@ class Table extends Component {
             var tbody = entryPointsList.map((id) => {
                 var rowData = tableData.data[id]
                 return (
-                    <Row key={rowData.id} rowDataId={rowData.id} tableData={tableData} filteredRowIdList={this.state.filteredRowIdList} triggerRow={this.triggerRow} />
+                    <Row key={rowData.id} rowDataId={rowData.id} tableData={tableData} filteredRowIdList={this.state.filteredRowIdList} triggerRow={this.triggerRow} columnVisibility={this.state.columnVisibility} />
                 )
             })
 
@@ -277,11 +294,15 @@ class Table extends Component {
                     />)
             })
 
+            var columnVisibilityContainer = <ColumnVisibility tableData={tableData} columnVisibility={this.state.columnVisibility} hideColumnVisibility={this.hideColumnVisibility} />
+
             return (
                 <div className={styles.tableContainer} onClick={(e) => { this.onClickInTable(e) }}>
                     {columnFilters}
+                    {columnVisibilityContainer}
+                    <MenuBar tableData={tableData} toogleColumnVisibilityContainer={this.toogleColumnVisibilityContainer} />
                     <table style={getStyle(tableData.style, this.props)}>
-                        <HeaderRow tableData={tableData} toggleFilter={this.toggleFilter} columnFilter={this.state.columnFilter} />
+                        <HeaderRow tableData={tableData} toggleFilter={this.toggleFilter} columnFilter={this.state.columnFilter} columnVisibility={this.state.columnVisibility} />
                         <tbody>
                             {tbody}
                         </tbody>

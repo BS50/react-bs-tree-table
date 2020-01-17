@@ -10,17 +10,18 @@ class Row extends Component {
     getRow = () => {
         var rowData = this.props.tableData.data[this.props.rowDataId]
         var row = this.props.tableData.columns.map((columnInfo) => {
-            if (columnInfo.columnHidden) {
-                return <React.Fragment key={columnInfo.field}></React.Fragment>
-            } else {
+            var columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
+            if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                 return (
                     <Cell key={columnInfo.field}
-                        tableData={this.props.tableData}
-                        rowDataId={this.props.rowDataId}
-                        columnInfo={columnInfo}
-                        triggerRow={this.props.triggerRow}
+                          tableData={this.props.tableData}
+                          rowDataId={this.props.rowDataId}
+                          columnInfo={columnInfo}
+                          triggerRow={this.props.triggerRow}
                     />
                 )
+            } else {
+                return <React.Fragment key={columnInfo.field}></React.Fragment>
             }
         })
         if (this.props.filteredRowIdList.includes(this.props.rowDataId.toString())) {
@@ -47,7 +48,8 @@ class Row extends Component {
                             rowDataId={childRowId}
                             tableData={this.props.tableData}
                             filteredRowIdList={this.props.filteredRowIdList}
-                            triggerRow={this.props.triggerRow} />
+                            triggerRow={this.props.triggerRow}
+                            columnVisibility={this.props.columnVisibility} />
                     })
                 )
             }
@@ -62,6 +64,7 @@ class Row extends Component {
 Row.propTypes = {
     tableData: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
+    columnVisibility: PropTypes.object.isRequired,
     filteredRowIdList: PropTypes.array.isRequired,
     rowDataId: PropTypes.number.isRequired
 }

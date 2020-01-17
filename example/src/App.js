@@ -74,7 +74,8 @@ export default class App extends Component {
             entryPoints: [
                 0, 1
             ],
-            filterActive: true
+            filterActive: true,
+            columnVisibility: true
         }
     }
     getSimpleData() {

@@ -14,18 +14,19 @@ class HeaderRow extends Component {
     render() {
         var columns = this.props.tableData.columns
         if (columns !== undefined) {
-            var headers = columns.map((headerInfo) => {
-                var isColumnHidden = headerInfo.columnHidden
-                if (isColumnHidden) {
-                    return <React.Fragment key={headerInfo.field}></React.Fragment>
+            var headers = columns.map((columnInfo) => {
+                var columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
+                if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
+                    return <HeaderCell
+                        key={columnInfo.field}
+                        tableData={this.props.tableData}
+                        toggleFilter={this.toggleFilter}
+                        info={columnInfo}
+                        columnFilter={this.props.columnFilter[columnInfo.field]}
+                    />
+                } else {
+                    return <React.Fragment key={columnInfo.field}></React.Fragment>
                 }
-                return <HeaderCell
-                    key={headerInfo.field}
-                    tableData={this.props.tableData}
-                    toggleFilter={this.toggleFilter}
-                    info={headerInfo}
-                    columnFilter={this.props.columnFilter[headerInfo.field]}
-                />
             });
             return (
                 <thead>
@@ -42,6 +43,7 @@ class HeaderRow extends Component {
 
 HeaderRow.propTypes = {
     tableData: PropTypes.object.isRequired,
+    columnVisibility: PropTypes.object.isRequired,
     columnFilter: PropTypes.object.isRequired,
     toggleFilter: PropTypes.func.isRequired
 }
