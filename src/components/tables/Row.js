@@ -24,7 +24,7 @@ class Row extends Component {
                 return <React.Fragment key={columnInfo.field}></React.Fragment>
             }
         })
-        if (this.props.filteredRowIdList.includes(this.props.rowDataId.toString())) {
+        if (this.props.filteredRowIdList.includes(this.props.rowDataId)) {
             return (
                 <tr key={rowData.id}>
                     {row}
@@ -54,6 +54,8 @@ class Row extends Component {
                 )
             }
 
+            console.log('rowList ' + this.props.rowDataId)
+            console.log(rowList)
             return rowList
         }
 

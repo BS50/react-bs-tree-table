@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faColumns} from '@fortawesome/free-solid-svg-icons'
 import styles from '../../styles.css'
-import ColumnVisibility from './ColumnVisibility'
 
 class MenuBar extends Component {
     render() {

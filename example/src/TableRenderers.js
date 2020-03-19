@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 export const renderYearCell = (tableData, rowDataId, columnId) => {
     var rowData = tableData.data[rowDataId]

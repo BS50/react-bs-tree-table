@@ -152,7 +152,7 @@ var renderCell = function renderCell(renderFunc, tableData, rowDataId, columnId)
     var rowData = tableData.data[rowDataId];
     var cellInfo = rowData[columnId];
     if (renderFunc) {
-        return renderFunc(tableData, rowDataId, columnId);
+        return renderFunc(tableData.sourceTableData, rowDataId, columnId);
     }
     return cellInfo.value;
 };
@@ -1888,7 +1888,7 @@ var Row = function (_Component) {
                     return React.createElement(React.Fragment, { key: columnInfo.field });
                 }
             });
-            if (_this.props.filteredRowIdList.includes(_this.props.rowDataId.toString())) {
+            if (_this.props.filteredRowIdList.includes(_this.props.rowDataId)) {
                 return React.createElement(
                     'tr',
                     { key: rowData.id },
@@ -1924,6 +1924,8 @@ var Row = function (_Component) {
                     }));
                 }
 
+                console.log('rowList ' + this.props.rowDataId);
+                console.log(rowList);
                 return rowList;
             }
 
@@ -2038,6 +2040,44 @@ ColumnFilter.propTypes = {
 
 var css$2 = ".Table_filterButton__JvbUD {\n    float: right;\n}\n\n.Table_transparentButton__2DCOH {\n    background-color: Transparent;\n    background-repeat:no-repeat;\n    border: none;\n}\n\n.Table_active-filter__1pKvs {\n    color: #009f13;\n}\n.Table_table-container__Td0Zr {\n    position: static;\n}";
 styleInject(css$2);
+
+var MenuBar = function (_Component) {
+    inherits(MenuBar, _Component);
+
+    function MenuBar() {
+        classCallCheck(this, MenuBar);
+        return possibleConstructorReturn(this, (MenuBar.__proto__ || Object.getPrototypeOf(MenuBar)).apply(this, arguments));
+    }
+
+    createClass(MenuBar, [{
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            var ret = React.createElement(React.Fragment, null);
+            if (this.props.tableData.columnVisibility) {
+                ret = React.createElement(
+                    'div',
+                    null,
+                    React.createElement(
+                        'button',
+                        { className: styles.transparentButton, onClick: function onClick(e) {
+                                _this2.props.toogleColumnVisibilityContainer(e.pageX, e.pageY);
+                            } },
+                        React.createElement(FontAwesomeIcon, { icon: faColumns })
+                    )
+                );
+            }
+            return ret;
+        }
+    }]);
+    return MenuBar;
+}(Component);
+
+MenuBar.propTypes = {
+    tableData: PropTypes.object.isRequired,
+    toogleColumnVisibilityContainer: PropTypes.func.isRequired
+};
 
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
@@ -2474,44 +2514,6 @@ ColumnVisibility.propTypes = {
 
 var ColumnVisibility$1 = onClickOutsideHOC(ColumnVisibility);
 
-var MenuBar = function (_Component) {
-    inherits(MenuBar, _Component);
-
-    function MenuBar() {
-        classCallCheck(this, MenuBar);
-        return possibleConstructorReturn(this, (MenuBar.__proto__ || Object.getPrototypeOf(MenuBar)).apply(this, arguments));
-    }
-
-    createClass(MenuBar, [{
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
-
-            var ret = React.createElement(React.Fragment, null);
-            if (this.props.tableData.columnVisibility) {
-                ret = React.createElement(
-                    'div',
-                    null,
-                    React.createElement(
-                        'button',
-                        { className: styles.transparentButton, onClick: function onClick(e) {
-                                _this2.props.toogleColumnVisibilityContainer(e.pageX, e.pageY);
-                            } },
-                        React.createElement(FontAwesomeIcon, { icon: faColumns })
-                    )
-                );
-            }
-            return ret;
-        }
-    }]);
-    return MenuBar;
-}(Component);
-
-MenuBar.propTypes = {
-    tableData: PropTypes.object.isRequired,
-    toogleColumnVisibilityContainer: PropTypes.func.isRequired
-};
-
 var Table$1 = function (_Component) {
     inherits(Table, _Component);
 
@@ -2560,10 +2562,8 @@ var Table$1 = function (_Component) {
             if (columnFilter.filteredValues.includes(value)) {
                 var index = columnFilter.filteredValues.indexOf(value);
                 columnFilter.filteredValues.splice(index, 1);
-                console.log(newState);
             } else {
                 columnFilter.filteredValues.push(value);
-                console.log(newState);
             }
 
             var currentFilteredIdList = Object.keys(_this.props.tableData.data).map(function (rowId) {
@@ -2624,8 +2624,6 @@ var Table$1 = function (_Component) {
                 }
             });
 
-            // var valuesArray = rowValues.map(rowValue => rowValue.value)
-            // var uniqueValuesArray = [...new Set(valuesArray)];
             var filteredValues = {};
             rowValues.map(function (rowValue) {
                 if (filteredValues[rowValue.value] === undefined) {
@@ -2733,7 +2731,7 @@ var Table$1 = function (_Component) {
             });
 
             var currentFilteredIdList = Object.keys(nextProps.tableData.data).map(function (rowId) {
-                return rowId;
+                return nextProps.tableData.data[rowId].id;
             });
             var newState = _extends({}, this.state, {});
             newState.filteredRowIdList = currentFilteredIdList;
@@ -2770,14 +2768,14 @@ var Table$1 = function (_Component) {
         value: function render() {
             var _this4 = this;
 
-            var tableData = _extends({}, this.props.tableData);
+            var tableData = JSON.parse(JSON.stringify(this.props.tableData));
+            tableData.sourceTableData = this.props.tableData;
             if (tableData.data !== undefined) {
                 var dataMap = {};
                 tableData.data.forEach(function (rowInfo) {
                     dataMap[rowInfo.id] = rowInfo;
                 });
                 tableData.data = dataMap;
-
                 var idList = Object.keys(tableData.data).sort(function (a, b) {
                     return parseInt(a) >= parseInt(b) ? 1 : -1;
                 });

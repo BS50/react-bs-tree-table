@@ -164,12 +164,50 @@ export default class App extends Component {
         }
     }
 
+    getTestData() {
+        return {
+            'columns': [
+                    {'field':'isummary','title':'Название'},
+                    {'field':'desired_quantity','title':'Жел.Кол-во'},
+                    {'field':'unit','title':'Ед.изм.'},
+                    {'field':'ez_vendorcode','title':'Внутренний артикул'},
+                    {'field':'object','title':'Объект'},
+                    {'field':'warehouse','title':'Склад'}
+                ],
+            'data':[
+                {
+                    'id':2,
+                    'isummary':{'value':'Взаимодействие с пресс-службой Роснано в рамках пресс-тура журналистов и блогеров (подготовка справки о компании, взаимодействие с корреспондентами информагентств, мониторинг СМИ)'},
+                    'quantity':{'value':30},'warehouse':{'value':'Инженерная'},
+                    'unit':{'value':'ч'},
+                    'ez_vendorcode':{'value':'MKG72297'},
+                    'owner':{'value':'malyarevich'},
+                    'desired_quantity':{'value':1},
+                    'level':0
+                },
+                {
+                    'id':3,
+                    'isummary':{'value':'Взаимодействие с корреспондентом портала «Хайтек» по подготовке лонгрида о компании'},
+                    'quantity':{'value':15},
+                    'warehouse':{'value':'Инженерная'},
+                    'unit':{'value':'ч'},
+                    'ez_vendorcode':{'value':'PIP74810'},
+                    'owner':{'value':'malyarevich'},
+                    'desired_quantity':{'value':12},
+                    'level':0
+                }
+            ]
+        }
+    }
+
     render () {
         // var tableData = this.getTreeData()
-        var tableData = this.getSimpleData()
+        var tableData = this.getTreeData()
 
         return (
+
             <div>
+                <div style={{backgroundColor: '#ebb867', }}>dDSF</div>
                 <Table tableData={tableData} />
             </div>
         )

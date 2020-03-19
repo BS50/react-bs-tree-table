@@ -40,7 +40,7 @@ class Table extends Component {
         })
 
         var currentFilteredIdList = Object.keys(nextProps.tableData.data).map((rowId) => {
-            return rowId
+            return nextProps.tableData.data[rowId].id
         })
         var newState = {...this.state, ...{}}
         newState.filteredRowIdList = currentFilteredIdList
@@ -109,10 +109,8 @@ class Table extends Component {
         if (columnFilter.filteredValues.includes(value)) {
             var index = columnFilter.filteredValues.indexOf(value)
             columnFilter.filteredValues.splice(index, 1)
-            console.log(newState)
         } else {
             columnFilter.filteredValues.push(value)
-            console.log(newState)
         }
 
         var currentFilteredIdList = Object.keys(this.props.tableData.data).map((rowId) => {
@@ -161,7 +159,7 @@ class Table extends Component {
                 if (cellInfo.filterFunc === undefined) {
                     cellValues = [{value: cellInfo.value, renderedValue: cellInfo.value}]
                 } else {
-                    cellValues = cellInfo.filterFunc(this.props.tableData, rowId, columnId)
+                    cellValues = cellInfo.filterFunc(this.props.tableData.source, rowId, columnId)
                 }
                 cellValues.map((cellValue) => {
                     cellValue.rowId = rowId
@@ -173,8 +171,6 @@ class Table extends Component {
             }
         })
 
-        // var valuesArray = rowValues.map(rowValue => rowValue.value)
-        // var uniqueValuesArray = [...new Set(valuesArray)];
         var filteredValues = {}
         rowValues.map(rowValue => {
             if (filteredValues[rowValue.value] === undefined) {
@@ -250,14 +246,14 @@ class Table extends Component {
     }
 
     render() {
-        var tableData = {...this.props.tableData}
+        var tableData = JSON.parse(JSON.stringify(this.props.tableData))
+        tableData.sourceTableData = this.props.tableData
         if (tableData.data !== undefined) {
             var dataMap = {}
             tableData.data.forEach((rowInfo) => {
                 dataMap[rowInfo.id] = rowInfo
             })
             tableData.data = dataMap
-
             var idList = Object.keys(tableData.data).sort((a, b) => { return (parseInt(a) >= parseInt(b)) ? 1 : -1 })
             idList.map((id) => {
                 var rowData = tableData.data[id]
