@@ -18,53 +18,59 @@ class Cell extends Component {
     }
 
     getGroupButtonIcon = () => {
-        var rowData = this.props.tableData.data[this.props.rowDataId]
-        if (rowData.collapsed) {
+        if (this.props.serviceTableData.data[this.props.rowDataInfo.data.id].collapsed) {
             return faChevronRight
         }
         return faChevronDown
     }
 
     getGroupButton = () => {
-        var rowData = this.props.tableData.data[this.props.rowDataId]
         return (
-            <button style={this.getGroupButtonStyle()} onClick={(e) => this.props.triggerRow(rowData['id'])}>
+            <button style={this.getGroupButtonStyle()} onClick={
+                (e) => this.props.triggerRow(this.props.rowDataInfo.data.id)
+            }>
                 <FontAwesomeIcon icon={this.getGroupButtonIcon()} />
             </button>
         )
     }
 
     render() {
-        var columnId = this.props.columnInfo['field']
-        var rowData = this.props.tableData.data[this.props.rowDataId]
-        var cellInfo = rowData[columnId]
-        var isCellWithGroupButton = false
+        const columnId = this.props.columnInfo['field']
+        const rowDataInfo = this.props.rowDataInfo
+        const rowData = rowDataInfo.data
+        const cellInfo = rowData[columnId]
+        let isCellWithGroupButton = false
         if (rowData.childList !== undefined && rowData.childList.length > 0 && this.props.columnInfo.grouped) {
             isCellWithGroupButton = true
         }
         if (cellInfo !== undefined) {
-            var style = getCellStyle(this.props.tableData.defaultCellStyle, cellInfo.style, this.props)
+            let style = getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, cellInfo.style, this.props)
 
             if (this.props.columnInfo.grouped === true) {
-                var padding = rowData['level'] * C.LEVEL_PX_STEP
+                const padding = rowDataInfo.level * C.LEVEL_PX_STEP
                 style.paddingLeft = '' + padding + 'px'
             }
             if (isCellWithGroupButton) {
-                return <td style={style}>{this.getGroupButton()}{renderCell(cellInfo.render, this.props.tableData, this.props.rowDataId, columnId)}</td>
+                return <td style={style}>
+                    {this.getGroupButton()}
+                    {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
+                </td>
             } else {
-                return <td style={style}>{renderCell(cellInfo.render, this.props.tableData, this.props.rowDataId, columnId)}</td>
+                return <td style={style}>
+                    {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
+                </td>
             }
         }
 
-        return <td style={getCellStyle(this.props.tableData.defaultCellStyle, undefined, this.props)} />
+        return <td style={getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props)} />
     }
 }
 
 Cell.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
-    rowDataId: PropTypes.number.isRequired,
-    columnInfo: PropTypes.object.isRequired,
+    rowDataInfo: PropTypes.object.isRequired,
+    columnInfo: PropTypes.object.isRequired
 }
 
 export default Cell

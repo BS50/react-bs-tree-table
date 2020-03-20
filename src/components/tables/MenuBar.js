@@ -6,10 +6,13 @@ import styles from '../../styles.css'
 
 class MenuBar extends Component {
     render() {
-        var ret = <React.Fragment />
+        let ret = <React.Fragment />
         if (this.props.tableData.columnVisibility) {
             ret = <div>
-                <button className={styles.transparentButton} onClick={(e) => {this.props.toogleColumnVisibilityContainer(e.pageX, e.pageY) }}>
+                <button
+                    className={styles.transparentButton}
+                    onClick={(e) => { this.props.toogleColumnVisibilityContainer(e.pageX, e.pageY) }}
+                >
                     <FontAwesomeIcon icon={faColumns} />
                 </button>
             </div>

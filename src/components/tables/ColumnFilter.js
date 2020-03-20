@@ -34,10 +34,10 @@ class ColumnFilter extends Component {
 
     render() {
         if (this.props.columnFilter.isFilterActive) {
-            var valueRenderedValueMap = this.props.getRowValues(this.props.columnFilter.columnId)
-            var values = Object.keys(valueRenderedValueMap).map((value) => {
-                var renderedValue = valueRenderedValueMap[value].renderedValue
-                var isChoosen = this.props.columnFilter.filteredValues.includes(value)
+            const valueRenderedValueMap = this.props.getRowValues(this.props.columnFilter.columnId)
+            const values = Object.keys(valueRenderedValueMap).map((value) => {
+                const renderedValue = valueRenderedValueMap[value].renderedValue
+                const isChoosen = this.props.columnFilter.filteredValues.includes(value)
                 return (
                     <div key={value}>
                         <input
@@ -46,15 +46,6 @@ class ColumnFilter extends Component {
                             value={isChoosen}
                             onChange={() => { this.props.toggleFilterRow(this.props.columnFilter.columnId, value) }}
                         />
-                        {/*<Checkbox*/}
-                            {/*checked={isChoosen}*/}
-                            {/*value={isChoosen}*/}
-                            {/*color='primary'*/}
-                            {/*onChange={() => { this.props.toggleFilterRow(this.props.columnFilter.columnId, value) }}*/}
-                            {/*inputProps={{*/}
-                                {/*'aria-label': 'secondary checkbox'*/}
-                            {/*}}*/}
-                        {/*/>*/}
                         {renderedValue}
                     </div>
                 )

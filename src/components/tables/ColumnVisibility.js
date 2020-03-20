@@ -22,8 +22,8 @@ class ColumnVisibility extends Component {
 
     render() {
         if (this.props.columnVisibility.isActive) {
-            var values = this.props.tableData.columns.map((columnInfo) => {
-                var isHidden = this.props.columnVisibility.data[columnInfo.field].isHidden
+            const values = this.props.tableData.columns.map((columnInfo) => {
+                const isHidden = this.props.columnVisibility.data[columnInfo.field].isHidden
                 return <React.Fragment key={columnInfo.field}>
                     <input
                         type='checkbox'

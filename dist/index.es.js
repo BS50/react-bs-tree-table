@@ -143,16 +143,15 @@ var getCellStyle = function getCellStyle(defaultStyleFunc, cellStyleFunc, props)
 
 var renderHeaderCell = function renderHeaderCell(renderFunc, tableData, headerInfo) {
     if (renderFunc) {
-        return renderFunc(tableData, headerInfo);
+        return renderFunc(tableData.tableData, headerInfo);
     }
     return headerInfo.title;
 };
 
-var renderCell = function renderCell(renderFunc, tableData, rowDataId, columnId) {
-    var rowData = tableData.data[rowDataId];
+var renderCell = function renderCell(renderFunc, tableData, rowData, columnId) {
     var cellInfo = rowData[columnId];
     if (renderFunc) {
-        return renderFunc(tableData.sourceTableData, rowDataId, columnId);
+        return renderFunc(tableData.tableData, rowData, columnId);
     }
     return cellInfo.value;
 };
@@ -1657,12 +1656,12 @@ var HeaderCell = function (_Component) {
             }
             buttonClassName = buttonClassName.join(' ');
 
-            if (_this.props.tableData.filterActive) {
+            if (_this.props.serviceTableData.tableData.filterActive) {
                 return React.createElement(
                     'button',
                     { className: buttonClassName, onClick: function onClick(e) {
                             e.stopPropagation();
-                            _this.props.toggleFilter(e.pageX, e.pageY, _this.props.info.field);
+                            _this.props.toggleFilter(e.pageX, e.pageY, _this.props.columnInfo.field);
                         } },
                     React.createElement(FontAwesomeIcon, { icon: faFilter })
                 );
@@ -1677,11 +1676,11 @@ var HeaderCell = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            if (this.props.info !== undefined) {
+            if (this.props.columnInfo !== undefined) {
                 return React.createElement(
                     'th',
-                    { style: getStyle(this.props.info.style, this.props), key: this.props.info.field },
-                    renderHeaderCell(this.props.info.renderer, this.props.tableData, this.props.info),
+                    { style: getStyle(this.props.columnInfo.style, this.props), key: this.props.columnInfo.field },
+                    renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo),
                     this.getFilterIcon()
                 );
             }
@@ -1693,8 +1692,8 @@ var HeaderCell = function (_Component) {
 }(Component);
 
 HeaderCell.propTypes = {
-    tableData: PropTypes.object.isRequired,
-    info: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
+    columnInfo: PropTypes.object.isRequired,
     columnFilter: PropTypes.object,
     toggleFilter: PropTypes.func.isRequired
 };
@@ -1726,16 +1725,16 @@ var HeaderRow = function (_Component) {
         value: function render() {
             var _this2 = this;
 
-            var columns = this.props.tableData.columns;
+            var columns = this.props.serviceTableData.columns;
             if (columns !== undefined) {
                 var headers = columns.map(function (columnInfo) {
                     var columnVisibilityData = _this2.props.columnVisibility.data[columnInfo.field];
                     if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                         return React.createElement(HeaderCell, {
                             key: columnInfo.field,
-                            tableData: _this2.props.tableData,
+                            serviceTableData: _this2.props.serviceTableData,
                             toggleFilter: _this2.toggleFilter,
-                            info: columnInfo,
+                            columnInfo: columnInfo,
                             columnFilter: _this2.props.columnFilter[columnInfo.field]
                         });
                     } else {
@@ -1760,7 +1759,7 @@ var HeaderRow = function (_Component) {
 }(Component);
 
 HeaderRow.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
     columnVisibility: PropTypes.object.isRequired,
     columnFilter: PropTypes.object.isRequired,
     toggleFilter: PropTypes.func.isRequired
@@ -1793,17 +1792,15 @@ var Cell = function (_Component) {
                 border: 'none'
             };
         }, _this.getGroupButtonIcon = function () {
-            var rowData = _this.props.tableData.data[_this.props.rowDataId];
-            if (rowData.collapsed) {
+            if (_this.props.serviceTableData.data[_this.props.rowDataInfo.data.id].collapsed) {
                 return faChevronRight;
             }
             return faChevronDown;
         }, _this.getGroupButton = function () {
-            var rowData = _this.props.tableData.data[_this.props.rowDataId];
             return React.createElement(
                 'button',
                 { style: _this.getGroupButtonStyle(), onClick: function onClick(e) {
-                        return _this.props.triggerRow(rowData['id']);
+                        return _this.props.triggerRow(_this.props.rowDataInfo.data.id);
                     } },
                 React.createElement(FontAwesomeIcon, { icon: _this.getGroupButtonIcon() })
             );
@@ -1817,17 +1814,18 @@ var Cell = function (_Component) {
         key: 'render',
         value: function render() {
             var columnId = this.props.columnInfo['field'];
-            var rowData = this.props.tableData.data[this.props.rowDataId];
+            var rowDataInfo = this.props.rowDataInfo;
+            var rowData = rowDataInfo.data;
             var cellInfo = rowData[columnId];
             var isCellWithGroupButton = false;
             if (rowData.childList !== undefined && rowData.childList.length > 0 && this.props.columnInfo.grouped) {
                 isCellWithGroupButton = true;
             }
             if (cellInfo !== undefined) {
-                var style = getCellStyle(this.props.tableData.defaultCellStyle, cellInfo.style, this.props);
+                var style = getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, cellInfo.style, this.props);
 
                 if (this.props.columnInfo.grouped === true) {
-                    var padding = rowData['level'] * C.LEVEL_PX_STEP;
+                    var padding = rowDataInfo.level * C.LEVEL_PX_STEP;
                     style.paddingLeft = '' + padding + 'px';
                 }
                 if (isCellWithGroupButton) {
@@ -1835,27 +1833,27 @@ var Cell = function (_Component) {
                         'td',
                         { style: style },
                         this.getGroupButton(),
-                        renderCell(cellInfo.render, this.props.tableData, this.props.rowDataId, columnId)
+                        renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
                     );
                 } else {
                     return React.createElement(
                         'td',
                         { style: style },
-                        renderCell(cellInfo.render, this.props.tableData, this.props.rowDataId, columnId)
+                        renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
                     );
                 }
             }
 
-            return React.createElement('td', { style: getCellStyle(this.props.tableData.defaultCellStyle, undefined, this.props) });
+            return React.createElement('td', { style: getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props) });
         }
     }]);
     return Cell;
 }(Component);
 
 Cell.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
-    rowDataId: PropTypes.number.isRequired,
+    rowDataInfo: PropTypes.object.isRequired,
     columnInfo: PropTypes.object.isRequired
 };
 
@@ -1874,13 +1872,14 @@ var Row = function (_Component) {
         }
 
         return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = Row.__proto__ || Object.getPrototypeOf(Row)).call.apply(_ref, [this].concat(args))), _this), _this.getRow = function () {
-            var rowData = _this.props.tableData.data[_this.props.rowDataId];
-            var row = _this.props.tableData.columns.map(function (columnInfo) {
+            var rowDataInfo = _this.props.rowDataInfo;
+            var rowData = rowDataInfo.data;
+            var row = _this.props.serviceTableData.columns.map(function (columnInfo) {
                 var columnVisibilityData = _this.props.columnVisibility.data[columnInfo.field];
                 if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                     return React.createElement(Cell, { key: columnInfo.field,
-                        tableData: _this.props.tableData,
-                        rowDataId: _this.props.rowDataId,
+                        serviceTableData: _this.props.serviceTableData,
+                        rowDataInfo: rowDataInfo,
                         columnInfo: columnInfo,
                         triggerRow: _this.props.triggerRow
                     });
@@ -1888,7 +1887,7 @@ var Row = function (_Component) {
                     return React.createElement(React.Fragment, { key: columnInfo.field });
                 }
             });
-            if (_this.props.filteredRowIdList.includes(_this.props.rowDataId)) {
+            if (rowDataInfo.filtered) {
                 return React.createElement(
                     'tr',
                     { key: rowData.id },
@@ -1908,24 +1907,23 @@ var Row = function (_Component) {
         value: function render() {
             var _this2 = this;
 
-            if (this.props.tableData !== undefined) {
-                var rowData = this.props.tableData.data[this.props.rowDataId];
+            if (this.props.serviceTableData !== undefined) {
+                var rowDataInfo = this.props.rowDataInfo;
+                var rowData = rowDataInfo.data;
                 var row = this.getRow();
                 var rowList = [row];
-                if (rowData['collapsed'] !== true && rowData.childList !== undefined) {
+                if (this.props.serviceTableData.data[rowData.id].collapsed !== true && rowData.childList !== undefined) {
                     rowList = rowList.concat(rowData.childList.map(function (childRowId) {
+                        var childRowDataInfo = _this2.props.serviceTableData.data[childRowId];
                         return React.createElement(Row, {
                             key: childRowId,
-                            rowDataId: childRowId,
-                            tableData: _this2.props.tableData,
-                            filteredRowIdList: _this2.props.filteredRowIdList,
+                            rowDataInfo: childRowDataInfo,
+                            serviceTableData: _this2.props.serviceTableData,
                             triggerRow: _this2.props.triggerRow,
-                            columnVisibility: _this2.props.columnVisibility });
+                            columnVisibility: _this2.props.columnVisibility
+                        });
                     }));
                 }
-
-                console.log('rowList ' + this.props.rowDataId);
-                console.log(rowList);
                 return rowList;
             }
 
@@ -1936,11 +1934,10 @@ var Row = function (_Component) {
 }(Component);
 
 Row.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
+    rowDataInfo: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
-    columnVisibility: PropTypes.object.isRequired,
-    filteredRowIdList: PropTypes.array.isRequired,
-    rowDataId: PropTypes.number.isRequired
+    columnVisibility: PropTypes.object.isRequired
 };
 
 var ColumnFilter = function (_Component) {
@@ -2061,9 +2058,12 @@ var MenuBar = function (_Component) {
                     null,
                     React.createElement(
                         'button',
-                        { className: styles.transparentButton, onClick: function onClick(e) {
+                        {
+                            className: styles.transparentButton,
+                            onClick: function onClick(e) {
                                 _this2.props.toogleColumnVisibilityContainer(e.pageX, e.pageY);
-                            } },
+                            }
+                        },
                         React.createElement(FontAwesomeIcon, { icon: faColumns })
                     )
                 );
@@ -2523,18 +2523,17 @@ var Table$1 = function (_Component) {
         var _this = possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
         _this.triggerRow = function (rowId) {
-            var rowInfo = _this.props.tableData.data[rowId];
-            if (rowInfo.collapsed) {
-                rowInfo.collapsed = undefined;
+            if (_this.state.serviceTableData.data[rowId].collapsed) {
+                _this.state.serviceTableData.data[rowId].collapsed = undefined;
             } else {
-                rowInfo.collapsed = true;
+                _this.state.serviceTableData.data[rowId].collapsed = true;
             }
         };
 
         _this.toggleFilter = function (x, y, columnId) {
             var newState = _extends({}, _this.state, {});
 
-            _this.props.tableData.columns.map(function (columnInfo) {
+            _this.state.serviceTableData.columns.map(function (columnInfo) {
                 _this.closeColumnFilter(columnInfo.field);
             });
 
@@ -2566,9 +2565,11 @@ var Table$1 = function (_Component) {
                 columnFilter.filteredValues.push(value);
             }
 
-            var currentFilteredIdList = Object.keys(_this.props.tableData.data).map(function (rowId) {
+            var currentFilteredIdList = Object.keys(_this.state.serviceTableData.data).map(function (rowId) {
+                _this.state.serviceTableData.data[rowId].filtered = false;
                 return rowId;
             });
+            console.log(currentFilteredIdList);
             Object.keys(_this.state.columnFilter).map(function (columnId) {
                 var columnFilteredRowIdList = [];
                 // var columnId = "total_quantity"
@@ -2576,10 +2577,9 @@ var Table$1 = function (_Component) {
                 var rowValues = _this.getRowValues(columnId);
                 columnFilter.filteredValues.map(function (value) {
                     rowValues[value].rowIdList.map(function (rowId) {
-                        columnFilteredRowIdList[rowId] = rowId;
+                        columnFilteredRowIdList.push(rowId);
                     });
                 });
-                columnFilteredRowIdList = Object.keys(columnFilteredRowIdList);
                 var bufferFilteredIdList = [];
                 if (columnFilteredRowIdList.length === 0) {
                     bufferFilteredIdList = currentFilteredIdList;
@@ -2595,31 +2595,34 @@ var Table$1 = function (_Component) {
 
                 currentFilteredIdList = bufferFilteredIdList;
             });
-            newState.filteredRowIdList = currentFilteredIdList;
+
+            currentFilteredIdList.map(function (rowId) {
+                newState.serviceTableData.data[rowId].filtered = true;
+            });
+
+            // newState.serviceInfo.filteredRowIdList = currentFilteredIdList
+            console.log(newState.serviceTableData.data);
 
             _this.setState(newState);
         };
 
         _this.getRowValues = function (columnId) {
             var rowValues = [];
-            Object.keys(_this.props.tableData.data).map(function (rowId) {
-                var rowInfo = _this.props.tableData.data[rowId];
+            Object.keys(_this.state.serviceTableData.data).map(function (rowId) {
+                var rowDataInfo = _this.state.serviceTableData.data[rowId];
+                var rowInfo = rowDataInfo.data;
                 var cellInfo = rowInfo[columnId];
-                // var cellValues = [{value: cellInfo.value, renderedValue: cellInfo.value}]
 
                 if (cellInfo !== undefined) {
                     var cellValues = [];
                     if (cellInfo.filterFunc === undefined) {
                         cellValues = [{ value: cellInfo.value, renderedValue: cellInfo.value }];
                     } else {
-                        cellValues = cellInfo.filterFunc(_this.props.tableData, rowId, columnId);
+                        cellValues = cellInfo.filterFunc(_this.state.serviceTableData.tableData, rowId, columnId);
                     }
                     cellValues.map(function (cellValue) {
                         cellValue.rowId = rowId;
                     });
-                    rowValues = rowValues.concat(cellValues);
-                } else {
-                    cellValues = [{ value: ' ', renderedValue: ' ', rowId: rowId }];
                     rowValues = rowValues.concat(cellValues);
                 }
             });
@@ -2635,49 +2638,12 @@ var Table$1 = function (_Component) {
             return filteredValues;
         };
 
-        _this.submitColumnFilter = function (columnId) {
-            var currentFilteredIdList = Object.keys(_this.props.tableData.data).map(function (rowId) {
-                return rowId;
-            });
-            Object.keys(_this.state.columnFilter).map(function (columnId) {
-                var columnFilteredRowIdList = [];
-                // var columnId = "total_quantity"
-                var columnFilter = _this.state.columnFilter[columnId];
-                var rowValues = _this.getRowValues(columnId);
-                columnFilter.filteredValues.map(function (value) {
-                    rowValues[value].rowIdList.map(function (rowId) {
-                        columnFilteredRowIdList[rowId] = rowId;
-                    });
-                });
-                columnFilteredRowIdList = Object.keys(columnFilteredRowIdList);
-                var bufferFilteredIdList = [];
-                if (columnFilteredRowIdList.length === 0) {
-                    bufferFilteredIdList = currentFilteredIdList;
-                } else if (currentFilteredIdList.length === 0) {
-                    bufferFilteredIdList = columnFilteredRowIdList;
-                } else {
-                    currentFilteredIdList.map(function (currentFilteredId) {
-                        if (columnFilteredRowIdList.includes(currentFilteredId)) {
-                            bufferFilteredIdList.push(currentFilteredId);
-                        }
-                    });
-                }
-
-                currentFilteredIdList = bufferFilteredIdList;
-            });
-
-            var newState = _extends({}, _this.state, {});
-            newState.filteredRowIdList = currentFilteredIdList;
-            newState.columnFilter[columnId].isFilterActive = false;
-            _this.setState(newState);
-        };
-
         _this.onClickInTable = function (e) {
             _this.closeAllColumnFilters();
         };
 
         _this.closeAllColumnFilters = function () {
-            _this.props.tableData.columns.map(function (columnInfo) {
+            _this.state.serviceTableData.columns.map(function (columnInfo) {
                 _this.closeColumnFilter(columnInfo.field);
             });
         };
@@ -2705,7 +2671,7 @@ var Table$1 = function (_Component) {
                 isActive: false,
                 data: {}
             },
-            filteredRowIdList: []
+            serviceTableData: {}
         };
         return _this;
     }
@@ -2720,34 +2686,65 @@ var Table$1 = function (_Component) {
         value: function componentWillReceiveProps(nextProps) {
             var _this2 = this;
 
+            var newState = _extends({}, this.state, {});
+
+            if (nextProps.tableData.data !== undefined) {
+                var serviceTableData = {};
+                serviceTableData.tableData = nextProps.tableData;
+                serviceTableData.columns = nextProps.tableData.columns;
+                serviceTableData.data = {};
+                nextProps.tableData.data.forEach(function (rowInfo) {
+                    serviceTableData.data[rowInfo.id] = { data: rowInfo, filtered: true };
+                });
+                var idList = Object.keys(serviceTableData.data).sort(function (a, b) {
+                    return parseInt(a) >= parseInt(b) ? 1 : -1;
+                });
+                idList.map(function (id) {
+                    var rowDataInfo = serviceTableData.data[id];
+                    if (rowDataInfo.level === undefined) {
+                        _this2.updateLevel(serviceTableData, rowDataInfo, 0);
+                    }
+                });
+                serviceTableData.entryPoints = nextProps.tableData.entryPoints;
+                if (serviceTableData.entryPoints === undefined) {
+                    serviceTableData.entryPoints = Object.keys(serviceTableData.data).map(function (rowId) {
+                        return rowId;
+                    });
+                }
+                serviceTableData.entryPoints = serviceTableData.entryPoints.sort(function (a, b) {
+                    return parseInt(a) >= parseInt(b) ? 1 : -1;
+                });
+                newState.serviceTableData = serviceTableData;
+            }
+
             nextProps.tableData.columns.map(function (columnInfo) {
-                _this2.state.columnFilter[columnInfo.field] = {
+                newState.columnFilter[columnInfo.field] = {
                     isFilterActive: false,
                     columnId: columnInfo.field,
                     filteredValues: [],
                     filteredRows: []
                 };
-                _this2.state.columnVisibility.data[columnInfo.field] = { isHidden: false };
+                newState.columnVisibility.data[columnInfo.field] = { isHidden: false };
             });
 
-            var currentFilteredIdList = Object.keys(nextProps.tableData.data).map(function (rowId) {
-                return nextProps.tableData.data[rowId].id;
-            });
-            var newState = _extends({}, this.state, {});
-            newState.filteredRowIdList = currentFilteredIdList;
+            // newState.serviceInfo.filteredRowIdList = Object.keys(nextProps.tableData.data).map((rowId) => {
+            //     return nextProps.tableData.data[rowId].id
+            // })
             this.setState(newState);
+            console.log(newState);
         }
     }, {
         key: 'updateLevel',
-        value: function updateLevel(rowDataList, rowData, level) {
+        value: function updateLevel(serviceTableData, rowDataInfo, level) {
             var _this3 = this;
 
-            rowData['level'] = level;
+            rowDataInfo.level = level;
+            var rowData = rowDataInfo.data;
             if (rowData.childList !== undefined) {
-                rowData.childList.map(function (childRowIndex) {
-                    var childRowData = rowDataList[childRowIndex];
-                    if (childRowData.level === undefined) {
-                        _this3.updateLevel(rowDataList, childRowData, level + 1);
+                rowData.childList.map(function (childRowId) {
+                    var childRowDataInfo = serviceTableData.data[childRowId];
+                    if (childRowDataInfo.level === undefined) {
+                        _this3.updateLevel(serviceTableData.data, childRowDataInfo, level + 1);
                     }
                 });
             }
@@ -2768,54 +2765,30 @@ var Table$1 = function (_Component) {
         value: function render() {
             var _this4 = this;
 
-            var tableData = JSON.parse(JSON.stringify(this.props.tableData));
-            tableData.sourceTableData = this.props.tableData;
-            if (tableData.data !== undefined) {
-                var dataMap = {};
-                tableData.data.forEach(function (rowInfo) {
-                    dataMap[rowInfo.id] = rowInfo;
-                });
-                tableData.data = dataMap;
-                var idList = Object.keys(tableData.data).sort(function (a, b) {
-                    return parseInt(a) >= parseInt(b) ? 1 : -1;
-                });
-                idList.map(function (id) {
-                    var rowData = tableData.data[id];
-                    if (rowData.level === undefined) {
-                        _this4.updateLevel(tableData.data, rowData, 0);
-                    }
-                });
-                var entryPointsList = tableData.entryPoints;
-                if (tableData.entryPoints === undefined) {
-                    entryPointsList = Object.keys(tableData.data).map(function (rowId) {
-                        return rowId;
+            if (this.state.serviceTableData.data !== undefined) {
+                var tbody = this.state.serviceTableData.entryPoints.map(function (id) {
+                    var rowDataInfo = _this4.state.serviceTableData.data[id];
+                    return React.createElement(Row, {
+                        key: rowDataInfo.data.id,
+                        rowDataInfo: rowDataInfo,
+                        serviceTableData: _this4.state.serviceTableData,
+                        triggerRow: _this4.triggerRow,
+                        columnVisibility: _this4.state.columnVisibility
                     });
-                }
-                entryPointsList = entryPointsList.sort(function (a, b) {
-                    return parseInt(a) >= parseInt(b) ? 1 : -1;
-                });
-                var tbody = entryPointsList.map(function (id) {
-                    var rowData = tableData.data[id];
-                    return React.createElement(Row, { key: rowData.id, rowDataId: rowData.id, tableData: tableData, filteredRowIdList: _this4.state.filteredRowIdList, triggerRow: _this4.triggerRow, columnVisibility: _this4.state.columnVisibility });
-                });
-
-                idList.map(function (id) {
-                    tableData.data[id].rendered = undefined;
                 });
 
                 var columnFilters = Object.keys(this.state.columnFilter).map(function (colId) {
                     return React.createElement(ColumnFilter, {
                         key: colId,
-                        tableData: _this4.props.tableData,
+                        tableData: _this4.state.serviceTableData,
                         columnFilter: _this4.state.columnFilter[colId],
                         closeColumnFilter: _this4.closeColumnFilter,
                         toggleFilterRow: _this4.toggleFilterRow,
-                        submitColumnFilter: _this4.submitColumnFilter,
                         getRowValues: _this4.getRowValues
                     });
                 });
 
-                var columnVisibilityContainer = React.createElement(ColumnVisibility$1, { tableData: tableData, columnVisibility: this.state.columnVisibility, hideColumnVisibility: this.hideColumnVisibility });
+                var columnVisibilityContainer = React.createElement(ColumnVisibility$1, { tableData: this.state.serviceTableData, columnVisibility: this.state.columnVisibility, hideColumnVisibility: this.hideColumnVisibility });
 
                 return React.createElement(
                     'div',
@@ -2824,11 +2797,16 @@ var Table$1 = function (_Component) {
                         } },
                     columnFilters,
                     columnVisibilityContainer,
-                    React.createElement(MenuBar, { tableData: tableData, toogleColumnVisibilityContainer: this.toogleColumnVisibilityContainer }),
+                    React.createElement(MenuBar, { tableData: this.state.serviceTableData, toogleColumnVisibilityContainer: this.toogleColumnVisibilityContainer }),
                     React.createElement(
                         'table',
-                        { style: getStyle(tableData.style, this.props) },
-                        React.createElement(HeaderRow, { tableData: tableData, toggleFilter: this.toggleFilter, columnFilter: this.state.columnFilter, columnVisibility: this.state.columnVisibility }),
+                        { style: getStyle(this.state.serviceTableData.tableData.style, this.props) },
+                        React.createElement(HeaderRow, {
+                            serviceTableData: this.state.serviceTableData,
+                            toggleFilter: this.toggleFilter,
+                            columnFilter: this.state.columnFilter,
+                            columnVisibility: this.state.columnVisibility
+                        }),
                         React.createElement(
                             'tbody',
                             null,

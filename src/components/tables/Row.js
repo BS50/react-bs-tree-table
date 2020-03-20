@@ -8,23 +8,24 @@ class Row extends Component {
     }
 
     getRow = () => {
-        var rowData = this.props.tableData.data[this.props.rowDataId]
-        var row = this.props.tableData.columns.map((columnInfo) => {
-            var columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
+        const rowDataInfo = this.props.rowDataInfo
+        const rowData = rowDataInfo.data
+        const row = this.props.serviceTableData.columns.map((columnInfo) => {
+            const columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
             if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                 return (
                     <Cell key={columnInfo.field}
-                          tableData={this.props.tableData}
-                          rowDataId={this.props.rowDataId}
-                          columnInfo={columnInfo}
-                          triggerRow={this.props.triggerRow}
+                        serviceTableData={this.props.serviceTableData}
+                        rowDataInfo={rowDataInfo}
+                        columnInfo={columnInfo}
+                        triggerRow={this.props.triggerRow}
                     />
                 )
             } else {
                 return <React.Fragment key={columnInfo.field}></React.Fragment>
             }
         })
-        if (this.props.filteredRowIdList.includes(this.props.rowDataId)) {
+        if (rowDataInfo.filtered) {
             return (
                 <tr key={rowData.id}>
                     {row}
@@ -36,26 +37,25 @@ class Row extends Component {
     }
 
     render() {
-        if (this.props.tableData !== undefined) {
-            var rowData = this.props.tableData.data[this.props.rowDataId]
-            var row = this.getRow()
-            var rowList = [row]
-            if (rowData['collapsed'] !== true && rowData.childList !== undefined) {
+        if (this.props.serviceTableData !== undefined) {
+            const rowDataInfo = this.props.rowDataInfo
+            const rowData = rowDataInfo.data
+            const row = this.getRow()
+            let rowList = [row]
+            if (this.props.serviceTableData.data[rowData.id].collapsed !== true && rowData.childList !== undefined) {
                 rowList = rowList.concat(
                     rowData.childList.map(childRowId => {
+                        const childRowDataInfo = this.props.serviceTableData.data[childRowId]
                         return <Row
                             key={childRowId}
-                            rowDataId={childRowId}
-                            tableData={this.props.tableData}
-                            filteredRowIdList={this.props.filteredRowIdList}
+                            rowDataInfo={childRowDataInfo}
+                            serviceTableData={this.props.serviceTableData}
                             triggerRow={this.props.triggerRow}
-                            columnVisibility={this.props.columnVisibility} />
+                            columnVisibility={this.props.columnVisibility}
+                        />
                     })
                 )
             }
-
-            console.log('rowList ' + this.props.rowDataId)
-            console.log(rowList)
             return rowList
         }
 
@@ -64,11 +64,10 @@ class Row extends Component {
 }
 
 Row.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
+    rowDataInfo: PropTypes.object.isRequired,
     triggerRow: PropTypes.func.isRequired,
-    columnVisibility: PropTypes.object.isRequired,
-    filteredRowIdList: PropTypes.array.isRequired,
-    rowDataId: PropTypes.number.isRequired
+    columnVisibility: PropTypes.object.isRequired
 }
 
 export default Row

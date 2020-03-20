@@ -19,16 +19,15 @@ export const getCellStyle = (defaultStyleFunc, cellStyleFunc, props) => {
 
 export const renderHeaderCell = (renderFunc, tableData, headerInfo) => {
     if (renderFunc) {
-        return renderFunc(tableData.sourceTableData, headerInfo)
+        return renderFunc(tableData.tableData, headerInfo)
     }
     return headerInfo.title
 }
 
-export const renderCell = (renderFunc, tableData, rowDataId, columnId) => {
-    var rowData = tableData.data[rowDataId]
-    var cellInfo = rowData[columnId]
+export const renderCell = (renderFunc, tableData, rowData, columnId) => {
+    const cellInfo = rowData[columnId]
     if (renderFunc) {
-        return renderFunc(tableData.sourceTableData, rowDataId, columnId)
+        return renderFunc(tableData.tableData, rowData, columnId)
     }
     return cellInfo.value
 }

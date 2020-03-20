@@ -26,7 +26,7 @@ export default class App extends Component {
             ],
             data: [
                 {
-                    'id': 0,
+                    'id': 'xxx-0',
                     'firstname': {
                         value: 'Иванов',
                         style: firstColumnStyle
@@ -39,17 +39,17 @@ export default class App extends Component {
                     }
                 },
                 {
-                    'id': 1,
+                    'id': 'yyy-1',
                     'firstname': {
                         value: 'Петров'
                     },
                     'secondname': {
                         value: 'Игорь'
                     },
-                    'childList': [2, 3]
+                    'childList': ['2', '3']
                 },
                 {
-                    'id': 2,
+                    'id': '2',
                     'firstname': {
                         value: 'Пушкин'
                     },
@@ -58,7 +58,7 @@ export default class App extends Component {
                     }
                 },
                 {
-                    'id': 3,
+                    'id': '3',
                     'firstname': {
                         value: 'Барышев'
                     },
@@ -72,7 +72,7 @@ export default class App extends Component {
             ],
             defaultCellStyle: defaultCellStyle,
             entryPoints: [
-                0, 1
+                'xxx-0', 'yyy-1'
             ],
             filterActive: true,
             columnVisibility: true
@@ -97,7 +97,7 @@ export default class App extends Component {
             ],
             data: [
                 {
-                    'id': 0,
+                    'id': '10',
                     'firstname': {
                         value: 'Иванов'
                     },
@@ -115,7 +115,7 @@ export default class App extends Component {
                     }
                 },
                 {
-                    'id': 1,
+                    'id': 'x-1',
                     'firstname': {
                         value: 'Петров'
                     },
@@ -133,7 +133,7 @@ export default class App extends Component {
                     }
                 },
                 {
-                    'id': 2,
+                    'id': 'y-2',
                     'firstname': {
                         value: 'Пушкин'
                     },
@@ -142,7 +142,7 @@ export default class App extends Component {
                     }
                 },
                 {
-                    'id': 3,
+                    'id': '30',
                     'firstname': {
                         value: 'Барышев'
                     },
@@ -201,13 +201,12 @@ export default class App extends Component {
     }
 
     render () {
-        // var tableData = this.getTreeData()
         var tableData = this.getTreeData()
+        // var tableData = this.getSimpleData()
 
         return (
 
             <div>
-                <div style={{backgroundColor: '#ebb867', }}>dDSF</div>
                 <Table tableData={tableData} />
             </div>
         )

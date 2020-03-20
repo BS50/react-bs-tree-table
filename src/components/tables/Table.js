@@ -20,7 +20,7 @@ class Table extends Component {
                 isActive: false,
                 data: {}
             },
-            filteredRowIdList: []
+            serviceTableData: {}
         }
     }
 
@@ -29,42 +29,64 @@ class Table extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        let newState = {...this.state, ...{}}
+
+        if (nextProps.tableData.data !== undefined) {
+            let serviceTableData = {}
+            serviceTableData.tableData = nextProps.tableData
+            serviceTableData.columns = nextProps.tableData.columns
+            serviceTableData.data = {}
+            nextProps.tableData.data.forEach((rowInfo) => {
+                serviceTableData.data[rowInfo.id] = {data: rowInfo, filtered: true}
+            })
+            let idList = Object.keys(serviceTableData.data).sort((a, b) => {
+                return (parseInt(a) >= parseInt(b)) ? 1 : -1
+            })
+            idList.map((id) => {
+                const rowDataInfo = serviceTableData.data[id]
+                if (rowDataInfo.level === undefined) {
+                    this.updateLevel(serviceTableData, rowDataInfo, 0)
+                }
+            })
+            serviceTableData.entryPoints = nextProps.tableData.entryPoints
+            if (serviceTableData.entryPoints === undefined) {
+                serviceTableData.entryPoints = Object.keys(serviceTableData.data).map((rowId) => {
+                    return rowId
+                })
+            }
+            serviceTableData.entryPoints = serviceTableData.entryPoints.sort((a, b) => {
+                return (parseInt(a) >= parseInt(b)) ? 1 : -1
+            })
+            newState.serviceTableData = serviceTableData
+        }
+
         nextProps.tableData.columns.map((columnInfo) => {
-            this.state.columnFilter[columnInfo.field] = {
+            newState.columnFilter[columnInfo.field] = {
                 isFilterActive: false,
                 columnId: columnInfo.field,
                 filteredValues: [],
                 filteredRows: []
             }
-            this.state.columnVisibility.data[columnInfo.field] = {isHidden: false}
+            newState.columnVisibility.data[columnInfo.field] = {isHidden: false}
         })
 
-        var currentFilteredIdList = Object.keys(nextProps.tableData.data).map((rowId) => {
-            return nextProps.tableData.data[rowId].id
-        })
-        var newState = {...this.state, ...{}}
-        newState.filteredRowIdList = currentFilteredIdList
+        // newState.serviceInfo.filteredRowIdList = Object.keys(nextProps.tableData.data).map((rowId) => {
+        //     return nextProps.tableData.data[rowId].id
+        // })
         this.setState(newState)
+        console.log(newState)
     }
 
-    updateLevel(rowDataList, rowData, level) {
-        rowData['level'] = level
+    updateLevel(serviceTableData, rowDataInfo, level) {
+        rowDataInfo.level = level
+        const rowData = rowDataInfo.data
         if (rowData.childList !== undefined) {
-            rowData.childList.map((childRowIndex) => {
-                var childRowData = rowDataList[childRowIndex]
-                if (childRowData.level === undefined) {
-                    this.updateLevel(rowDataList, childRowData, level + 1)
+            rowData.childList.map((childRowId) => {
+                const childRowDataInfo = serviceTableData.data[childRowId]
+                if (childRowDataInfo.level === undefined) {
+                    this.updateLevel(serviceTableData.data, childRowDataInfo, level + 1)
                 }
             })
-        }
-    }
-
-    triggerRow = (rowId) => {
-        var rowInfo = this.props.tableData.data[rowId]
-        if (rowInfo.collapsed) {
-            rowInfo.collapsed = undefined
-        } else {
-            rowInfo.collapsed = true
         }
     }
 
@@ -78,14 +100,22 @@ class Table extends Component {
         }
     }
 
-    toggleFilter = (x, y, columnId) => {
-        var newState = {...this.state, ...{}}
+    triggerRow = (rowId) => {
+        if (this.state.serviceTableData.data[rowId].collapsed) {
+            this.state.serviceTableData.data[rowId].collapsed = undefined
+        } else {
+            this.state.serviceTableData.data[rowId].collapsed = true
+        }
+    }
 
-        this.props.tableData.columns.map((columnInfo) => {
+    toggleFilter = (x, y, columnId) => {
+        let newState = {...this.state, ...{}}
+
+        this.state.serviceTableData.columns.map((columnInfo) => {
             this.closeColumnFilter(columnInfo.field)
         })
 
-        var offset = 1920 - 300
+        const offset = 1920 - 300
         if (x > offset) {
             x = offset
         }
@@ -104,30 +134,31 @@ class Table extends Component {
     }
 
     toggleFilterRow = (colId, value, rowIdList) => {
-        var newState = {...this.state, ...{}}
-        var columnFilter = newState.columnFilter[colId]
+        let newState = {...this.state, ...{}}
+        let columnFilter = newState.columnFilter[colId]
         if (columnFilter.filteredValues.includes(value)) {
-            var index = columnFilter.filteredValues.indexOf(value)
+            const index = columnFilter.filteredValues.indexOf(value)
             columnFilter.filteredValues.splice(index, 1)
         } else {
             columnFilter.filteredValues.push(value)
         }
 
-        var currentFilteredIdList = Object.keys(this.props.tableData.data).map((rowId) => {
+        let currentFilteredIdList = Object.keys(this.state.serviceTableData.data).map((rowId) => {
+            this.state.serviceTableData.data[rowId].filtered = false
             return rowId
         })
+        console.log(currentFilteredIdList)
         Object.keys(this.state.columnFilter).map((columnId) => {
-            var columnFilteredRowIdList = []
+            let columnFilteredRowIdList = []
             // var columnId = "total_quantity"
-            var columnFilter = this.state.columnFilter[columnId]
-            var rowValues = this.getRowValues(columnId)
+            const columnFilter = this.state.columnFilter[columnId]
+            const rowValues = this.getRowValues(columnId)
             columnFilter.filteredValues.map((value) => {
                 rowValues[value].rowIdList.map((rowId) => {
-                    columnFilteredRowIdList[rowId] = rowId
+                    columnFilteredRowIdList.push(rowId)
                 })
             })
-            columnFilteredRowIdList = Object.keys(columnFilteredRowIdList)
-            var bufferFilteredIdList = []
+            let bufferFilteredIdList = []
             if (columnFilteredRowIdList.length === 0) {
                 bufferFilteredIdList = currentFilteredIdList
             } else if (currentFilteredIdList.length === 0) {
@@ -142,36 +173,39 @@ class Table extends Component {
 
             currentFilteredIdList = bufferFilteredIdList
         })
-        newState.filteredRowIdList = currentFilteredIdList
+
+        currentFilteredIdList.map((rowId) => {
+            newState.serviceTableData.data[rowId].filtered = true
+        })
+
+        // newState.serviceInfo.filteredRowIdList = currentFilteredIdList
+        console.log(newState.serviceTableData.data)
 
         this.setState(newState)
     }
 
     getRowValues = (columnId) => {
-        var rowValues = []
-        Object.keys(this.props.tableData.data).map((rowId) => {
-            var rowInfo = this.props.tableData.data[rowId]
-            var cellInfo = rowInfo[columnId]
-            // var cellValues = [{value: cellInfo.value, renderedValue: cellInfo.value}]
+        let rowValues = []
+        Object.keys(this.state.serviceTableData.data).map((rowId) => {
+            const rowDataInfo = this.state.serviceTableData.data[rowId]
+            const rowInfo = rowDataInfo.data
+            const cellInfo = rowInfo[columnId]
 
             if (cellInfo !== undefined) {
-                var cellValues = []
+                let cellValues = []
                 if (cellInfo.filterFunc === undefined) {
                     cellValues = [{value: cellInfo.value, renderedValue: cellInfo.value}]
                 } else {
-                    cellValues = cellInfo.filterFunc(this.props.tableData.source, rowId, columnId)
+                    cellValues = cellInfo.filterFunc(this.state.serviceTableData.tableData, rowId, columnId)
                 }
                 cellValues.map((cellValue) => {
                     cellValue.rowId = rowId
                 })
                 rowValues = rowValues.concat(cellValues)
-            } else {
-                cellValues = [{value: ' ', renderedValue: ' ', rowId: rowId}]
-                rowValues = rowValues.concat(cellValues)
             }
         })
 
-        var filteredValues = {}
+        let filteredValues = {}
         rowValues.map(rowValue => {
             if (filteredValues[rowValue.value] === undefined) {
                 filteredValues[rowValue.value] = {renderedValue: rowValue.renderedValue, rowIdList: [rowValue.rowId]}
@@ -182,55 +216,18 @@ class Table extends Component {
         return filteredValues
     }
 
-    submitColumnFilter = (columnId) => {
-        var currentFilteredIdList = Object.keys(this.props.tableData.data).map((rowId) => {
-            return rowId
-        })
-        Object.keys(this.state.columnFilter).map((columnId) => {
-            var columnFilteredRowIdList = []
-            // var columnId = "total_quantity"
-            var columnFilter = this.state.columnFilter[columnId]
-            var rowValues = this.getRowValues(columnId)
-            columnFilter.filteredValues.map((value) => {
-                rowValues[value].rowIdList.map((rowId) => {
-                    columnFilteredRowIdList[rowId] = rowId
-                })
-            })
-            columnFilteredRowIdList = Object.keys(columnFilteredRowIdList)
-            var bufferFilteredIdList = []
-            if (columnFilteredRowIdList.length === 0) {
-                bufferFilteredIdList = currentFilteredIdList
-            } else if (currentFilteredIdList.length === 0) {
-                bufferFilteredIdList = columnFilteredRowIdList
-            } else {
-                currentFilteredIdList.map((currentFilteredId) => {
-                    if (columnFilteredRowIdList.includes(currentFilteredId)) {
-                        bufferFilteredIdList.push(currentFilteredId)
-                    }
-                })
-            }
-
-            currentFilteredIdList = bufferFilteredIdList
-        })
-
-        var newState = {...this.state, ...{}}
-        newState.filteredRowIdList = currentFilteredIdList
-        newState.columnFilter[columnId].isFilterActive = false
-        this.setState(newState)
-    }
-
     onClickInTable = (e) => {
         this.closeAllColumnFilters()
     }
 
     closeAllColumnFilters = () => {
-        this.props.tableData.columns.map((columnInfo) => {
+        this.state.serviceTableData.columns.map((columnInfo) => {
             this.closeColumnFilter(columnInfo.field)
         })
     }
 
     closeColumnFilter = (columnId) => {
-        var newState = {...this.state, ...{}}
+        let newState = {...this.state, ...{}}
         newState.columnFilter[columnId].isFilterActive = false
         this.setState(newState)
     }
@@ -246,59 +243,46 @@ class Table extends Component {
     }
 
     render() {
-        var tableData = JSON.parse(JSON.stringify(this.props.tableData))
-        tableData.sourceTableData = this.props.tableData
-        if (tableData.data !== undefined) {
-            var dataMap = {}
-            tableData.data.forEach((rowInfo) => {
-                dataMap[rowInfo.id] = rowInfo
-            })
-            tableData.data = dataMap
-            var idList = Object.keys(tableData.data).sort((a, b) => { return (parseInt(a) >= parseInt(b)) ? 1 : -1 })
-            idList.map((id) => {
-                var rowData = tableData.data[id]
-                if (rowData.level === undefined) {
-                    this.updateLevel(tableData.data, rowData, 0)
-                }
-            })
-            var entryPointsList = tableData.entryPoints
-            if (tableData.entryPoints === undefined) {
-                entryPointsList = Object.keys(tableData.data).map((rowId) => { return rowId })
-            }
-            entryPointsList = entryPointsList.sort((a, b) => { return (parseInt(a) >= parseInt(b)) ? 1 : -1 })
-            var tbody = entryPointsList.map((id) => {
-                var rowData = tableData.data[id]
+        if (this.state.serviceTableData.data !== undefined) {
+            const tbody = this.state.serviceTableData.entryPoints.map((id) => {
+                const rowDataInfo = this.state.serviceTableData.data[id]
                 return (
-                    <Row key={rowData.id} rowDataId={rowData.id} tableData={tableData} filteredRowIdList={this.state.filteredRowIdList} triggerRow={this.triggerRow} columnVisibility={this.state.columnVisibility} />
+                    <Row
+                        key={rowDataInfo.data.id}
+                        rowDataInfo={rowDataInfo}
+                        serviceTableData={this.state.serviceTableData}
+                        triggerRow={this.triggerRow}
+                        columnVisibility={this.state.columnVisibility}
+                    />
                 )
             })
 
-            idList.map((id) => {
-                tableData.data[id].rendered = undefined
-            })
-
-            var columnFilters = Object.keys(this.state.columnFilter).map((colId) => {
+            const columnFilters = Object.keys(this.state.columnFilter).map((colId) => {
                 return (
                     <ColumnFilter
                         key={colId}
-                        tableData={this.props.tableData}
+                        tableData={this.state.serviceTableData}
                         columnFilter={this.state.columnFilter[colId]}
                         closeColumnFilter={this.closeColumnFilter}
                         toggleFilterRow={this.toggleFilterRow}
-                        submitColumnFilter={this.submitColumnFilter}
                         getRowValues={this.getRowValues}
                     />)
             })
 
-            var columnVisibilityContainer = <ColumnVisibility tableData={tableData} columnVisibility={this.state.columnVisibility} hideColumnVisibility={this.hideColumnVisibility} />
+            const columnVisibilityContainer = <ColumnVisibility tableData={this.state.serviceTableData} columnVisibility={this.state.columnVisibility} hideColumnVisibility={this.hideColumnVisibility} />
 
             return (
                 <div className={styles.tableContainer} onClick={(e) => { this.onClickInTable(e) }}>
                     {columnFilters}
                     {columnVisibilityContainer}
-                    <MenuBar tableData={tableData} toogleColumnVisibilityContainer={this.toogleColumnVisibilityContainer} />
-                    <table style={getStyle(tableData.style, this.props)}>
-                        <HeaderRow tableData={tableData} toggleFilter={this.toggleFilter} columnFilter={this.state.columnFilter} columnVisibility={this.state.columnVisibility} />
+                    <MenuBar tableData={this.state.serviceTableData} toogleColumnVisibilityContainer={this.toogleColumnVisibilityContainer} />
+                    <table style={getStyle(this.state.serviceTableData.tableData.style, this.props)}>
+                        <HeaderRow
+                            serviceTableData={this.state.serviceTableData}
+                            toggleFilter={this.toggleFilter}
+                            columnFilter={this.state.columnFilter}
+                            columnVisibility={this.state.columnVisibility}
+                        />
                         <tbody>
                             {tbody}
                         </tbody>

@@ -13,16 +13,16 @@ class HeaderCell extends Component {
     }
 
     getFilterIcon = () => {
-        var buttonClassName = [styles.filterButton, styles.transparentButton]
+        let buttonClassName = [styles.filterButton, styles.transparentButton]
         if (this.props.columnFilter !== undefined && this.props.columnFilter.filteredValues.length > 0) {
             buttonClassName.push(styles.activeFilter)
         }
         buttonClassName = buttonClassName.join(' ')
 
-        if (this.props.tableData.filterActive) {
+        if (this.props.serviceTableData.tableData.filterActive) {
             return <button className={buttonClassName} onClick={(e) => {
                 e.stopPropagation()
-                this.props.toggleFilter(e.pageX, e.pageY, this.props.info.field)
+                this.props.toggleFilter(e.pageX, e.pageY, this.props.columnInfo.field)
             }}>
                 <FontAwesomeIcon icon={faFilter} />
             </button>
@@ -31,10 +31,10 @@ class HeaderCell extends Component {
     }
 
     render() {
-        if (this.props.info !== undefined) {
+        if (this.props.columnInfo !== undefined) {
             return (
-                <th style={getStyle(this.props.info.style, this.props)} key={this.props.info.field}>
-                    {renderHeaderCell(this.props.info.renderer, this.props.tableData, this.props.info)}
+                <th style={getStyle(this.props.columnInfo.style, this.props)} key={this.props.columnInfo.field}>
+                    {renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo)}
                     {this.getFilterIcon()}
                 </th>
             )
@@ -45,8 +45,8 @@ class HeaderCell extends Component {
 }
 
 HeaderCell.propTypes = {
-    tableData: PropTypes.object.isRequired,
-    info: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
+    columnInfo: PropTypes.object.isRequired,
     columnFilter: PropTypes.object,
     toggleFilter: PropTypes.func.isRequired
 }

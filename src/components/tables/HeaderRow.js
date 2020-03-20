@@ -12,16 +12,16 @@ class HeaderRow extends Component {
     }
 
     render() {
-        var columns = this.props.tableData.columns
+        const columns = this.props.serviceTableData.columns
         if (columns !== undefined) {
-            var headers = columns.map((columnInfo) => {
-                var columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
+            const headers = columns.map((columnInfo) => {
+                const columnVisibilityData = this.props.columnVisibility.data[columnInfo.field]
                 if (columnVisibilityData !== undefined && !columnVisibilityData.isHidden) {
                     return <HeaderCell
                         key={columnInfo.field}
-                        tableData={this.props.tableData}
+                        serviceTableData={this.props.serviceTableData}
                         toggleFilter={this.toggleFilter}
-                        info={columnInfo}
+                        columnInfo={columnInfo}
                         columnFilter={this.props.columnFilter[columnInfo.field]}
                     />
                 } else {
@@ -42,7 +42,7 @@ class HeaderRow extends Component {
 }
 
 HeaderRow.propTypes = {
-    tableData: PropTypes.object.isRequired,
+    serviceTableData: PropTypes.object.isRequired,
     columnVisibility: PropTypes.object.isRequired,
     columnFilter: PropTypes.object.isRequired,
     toggleFilter: PropTypes.func.isRequired
