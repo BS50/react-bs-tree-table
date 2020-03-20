@@ -74,7 +74,6 @@ class Table extends Component {
         //     return nextProps.tableData.data[rowId].id
         // })
         this.setState(newState)
-        console.log(newState)
     }
 
     updateLevel(serviceTableData, rowDataInfo, level) {
