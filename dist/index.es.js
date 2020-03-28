@@ -2731,7 +2731,6 @@ var Table$1 = function (_Component) {
             //     return nextProps.tableData.data[rowId].id
             // })
             this.setState(newState);
-            console.log(newState);
         }
     }, {
         key: 'updateLevel',
@@ -2744,7 +2743,7 @@ var Table$1 = function (_Component) {
                 rowData.childList.map(function (childRowId) {
                     var childRowDataInfo = serviceTableData.data[childRowId];
                     if (childRowDataInfo.level === undefined) {
-                        _this3.updateLevel(serviceTableData.data, childRowDataInfo, level + 1);
+                        _this3.updateLevel(serviceTableData, childRowDataInfo, level + 1);
                     }
                 });
             }

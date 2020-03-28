@@ -83,7 +83,7 @@ class Table extends Component {
             rowData.childList.map((childRowId) => {
                 const childRowDataInfo = serviceTableData.data[childRowId]
                 if (childRowDataInfo.level === undefined) {
-                    this.updateLevel(serviceTableData.data, childRowDataInfo, level + 1)
+                    this.updateLevel(serviceTableData, childRowDataInfo, level + 1)
                 }
             })
         }
