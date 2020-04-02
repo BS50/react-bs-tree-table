@@ -2714,13 +2714,13 @@ var Table$1 = function (_Component) {
                 });
                 serviceTableData.entryPoints = nextProps.tableData.entryPoints;
                 if (serviceTableData.entryPoints === undefined) {
-                    serviceTableData.entryPoints = Object.keys(serviceTableData.data).map(function (rowId) {
-                        return rowId;
+                    serviceTableData.entryPoints = nextProps.tableData.data.map(function (rowData) {
+                        return rowData.id;
                     });
                 }
-                serviceTableData.entryPoints = serviceTableData.entryPoints.sort(function (a, b) {
-                    return parseInt(a) >= parseInt(b) ? 1 : -1;
-                });
+                // serviceTableData.entryPoints = serviceTableData.entryPoints.sort((a, b) => {
+                //     return (parseInt(a) >= parseInt(b)) ? 1 : -1
+                // })
                 newState.serviceTableData = serviceTableData;
             }
 

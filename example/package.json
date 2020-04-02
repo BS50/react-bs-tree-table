@@ -7,9 +7,10 @@
   "dependencies": {
     "prop-types": "^15.6.2",
     "react": "^16.4.1",
+    "react-bs-tree-table": "file:..",
     "react-dom": "^16.4.1",
     "react-scripts": "^1.1.4",
-    "react-bs-tree-table": "file:.."
+    "uuid": "^7.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
