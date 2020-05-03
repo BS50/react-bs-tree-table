@@ -3,3 +3,31 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.example-cls {
+    background-color: red !important;
+}
+
+/*.name-column-class {*/
+    /*min-width: 5%;*/
+    /*max-width: 5%;*/
+/*}*/
+
+/*.default-column-class {*/
+    /*min-width: 45%;*/
+    /*max-width: 45%;*/
+/*}*/
+
+
+.table-class {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.name-column-class {
+    width: 10%;
+}
+
+.default-column-class {
+    width: 40%;
+}

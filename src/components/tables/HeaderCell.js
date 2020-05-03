@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import {getStyle, renderHeaderCell} from './Style'
+import {getStyle, renderHeaderCell, getClass} from './Style'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilter } from '@fortawesome/free-solid-svg-icons'
@@ -33,7 +33,10 @@ class HeaderCell extends Component {
     render() {
         if (this.props.columnInfo !== undefined) {
             return (
-                <th style={getStyle(this.props.columnInfo.style, this.props)} key={this.props.columnInfo.field}>
+                <th
+                    style={getStyle(this.props.columnInfo.style, this.props)} key={this.props.columnInfo.field}
+                    className={getClass(this.props.columnInfo.class, this.props)}
+                >
                     {renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo)}
                     {this.getFilterIcon()}
                 </th>

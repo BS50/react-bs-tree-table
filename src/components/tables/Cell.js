@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-import {getCellStyle, renderCell} from './Style'
+import {getClass, getCellStyle, renderCell} from './Style'
 import C from './C'
 
 class Cell extends Component {
@@ -45,24 +45,33 @@ class Cell extends Component {
         }
         if (cellInfo !== undefined) {
             let style = getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, cellInfo.style, this.props)
-
+            const className = getClass(cellInfo.class, this.props)
             if (this.props.columnInfo.grouped === true) {
                 const padding = rowDataInfo.level * C.LEVEL_PX_STEP
                 style.paddingLeft = '' + padding + 'px'
             }
             if (isCellWithGroupButton) {
-                return <td style={style}>
+                return <td
+                    style={style}
+                    className={className}
+                >
                     {this.getGroupButton()}
                     {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
                 </td>
             } else {
-                return <td style={style}>
+                return <td
+                    style={style}
+                    className={className}
+                >
                     {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
                 </td>
             }
         }
 
-        return <td style={getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props)} />
+        return <td
+            style={getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props)}
+            className={getClass(undefined, this.props)}
+        />
     }
 }
 

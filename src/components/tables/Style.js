@@ -17,6 +17,17 @@ export const getCellStyle = (defaultStyleFunc, cellStyleFunc, props) => {
     }
 }
 
+export const getClass = (cellClassFunc, props) => {
+    if (cellClassFunc !== undefined) {
+        if (cellClassFunc instanceof Function) {
+            return cellClassFunc(props)
+        } else if (typeof cellClassFunc === 'string') {
+            return cellClassFunc
+        }
+    }
+    return ''
+}
+
 export const renderHeaderCell = (renderFunc, tableData, headerInfo) => {
     if (renderFunc) {
         return renderFunc(tableData.tableData, headerInfo)

@@ -148,6 +148,17 @@ var getCellStyle = function getCellStyle(defaultStyleFunc, cellStyleFunc, props)
     }
 };
 
+var getClass = function getClass(cellClassFunc, props) {
+    if (cellClassFunc !== undefined) {
+        if (cellClassFunc instanceof Function) {
+            return cellClassFunc(props);
+        } else if (typeof cellClassFunc === 'string') {
+            return cellClassFunc;
+        }
+    }
+    return '';
+};
+
 var renderHeaderCell = function renderHeaderCell(renderFunc, tableData, headerInfo) {
     if (renderFunc) {
         return renderFunc(tableData.tableData, headerInfo);
@@ -1686,7 +1697,10 @@ var HeaderCell = function (_Component) {
             if (this.props.columnInfo !== undefined) {
                 return React__default.createElement(
                     'th',
-                    { style: getStyle(this.props.columnInfo.style, this.props), key: this.props.columnInfo.field },
+                    {
+                        style: getStyle(this.props.columnInfo.style, this.props), key: this.props.columnInfo.field,
+                        className: getClass(this.props.columnInfo.class, this.props)
+                    },
                     renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo),
                     this.getFilterIcon()
                 );
@@ -1830,7 +1844,7 @@ var Cell = function (_Component) {
             }
             if (cellInfo !== undefined) {
                 var style = getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, cellInfo.style, this.props);
-
+                var className = getClass(cellInfo.class, this.props);
                 if (this.props.columnInfo.grouped === true) {
                     var padding = rowDataInfo.level * C.LEVEL_PX_STEP;
                     style.paddingLeft = '' + padding + 'px';
@@ -1838,20 +1852,29 @@ var Cell = function (_Component) {
                 if (isCellWithGroupButton) {
                     return React__default.createElement(
                         'td',
-                        { style: style },
+                        {
+                            style: style,
+                            className: className
+                        },
                         this.getGroupButton(),
                         renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
                     );
                 } else {
                     return React__default.createElement(
                         'td',
-                        { style: style },
+                        {
+                            style: style,
+                            className: className
+                        },
                         renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
                     );
                 }
             }
 
-            return React__default.createElement('td', { style: getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props) });
+            return React__default.createElement('td', {
+                style: getCellStyle(this.props.serviceTableData.tableData.defaultCellStyle, undefined, this.props),
+                className: getClass(undefined, this.props)
+            });
         }
     }]);
     return Cell;
@@ -2806,7 +2829,10 @@ var Table$1 = function (_Component) {
                     React__default.createElement(MenuBar, { tableData: this.state.serviceTableData, toogleColumnVisibilityContainer: this.toogleColumnVisibilityContainer }),
                     React__default.createElement(
                         'table',
-                        { style: getStyle(this.state.serviceTableData.tableData.style, this.props) },
+                        {
+                            style: getStyle(this.state.serviceTableData.tableData.style, this.props),
+                            className: getClass(this.state.serviceTableData.tableData.class, this.props)
+                        },
                         React__default.createElement(HeaderRow, {
                             serviceTableData: this.state.serviceTableData,
                             toggleFilter: this.toggleFilter,

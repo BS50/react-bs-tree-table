@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import HeaderRow from './HeaderRow'
 import Row from './Row'
-import {getStyle} from './Style'
+import {getStyle, getClass} from './Style'
 import ColumnFilter from './ColumnFilter'
 import './Table.css'
 import styles from '../../styles.css'
@@ -275,7 +275,10 @@ class Table extends Component {
                     {columnFilters}
                     {columnVisibilityContainer}
                     <MenuBar tableData={this.state.serviceTableData} toogleColumnVisibilityContainer={this.toogleColumnVisibilityContainer} />
-                    <table style={getStyle(this.state.serviceTableData.tableData.style, this.props)}>
+                    <table
+                        style={getStyle(this.state.serviceTableData.tableData.style, this.props)}
+                        className={getClass(this.state.serviceTableData.tableData.class, this.props)}
+                    >
                         <HeaderRow
                             serviceTableData={this.state.serviceTableData}
                             toggleFilter={this.toggleFilter}

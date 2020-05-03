@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 // import ExampleComponent from 'react-bs-tree-table'
 import {ExampleComponent1, ExampleComponent, Table} from 'react-bs-tree-table'
 import {renderYearCell, yearFilterFunc} from './TableRenderers'
-import {firstColumnStyle, defaultCellStyle} from './TableStyles'
+import {firstColumnStyle, defaultCellStyle, exampleClass, defaultColumnClass, nameColumnClass} from './TableStyles'
 import { v4 as uuidv4 } from 'uuid'
 
 export default class App extends Component {
@@ -14,15 +14,18 @@ export default class App extends Component {
                 {
                     field: 'firstname',
                     title: 'Фамилия',
-                    grouped: true
+                    grouped: true,
+                    class: 'name-column-class'
                 },
                 {
                     field: 'secondname',
-                    title: 'Имя'
+                    title: 'Имя',
+                    class: defaultColumnClass
                 },
                 {
                     field: 'birthday',
-                    title: 'Дата рождения'
+                    title: 'Дата рождения',
+                    class: 'default-column-class'
                 }
             ],
             data: [
@@ -36,7 +39,8 @@ export default class App extends Component {
                         value: 'Сергей'
                     },
                     'birthday': {
-                        value: '12.04.1956'
+                        value: '12.04.1956',
+                        class: exampleClass
                     }
                 },
                 {
@@ -71,6 +75,7 @@ export default class App extends Component {
                     }
                 }
             ],
+            class: 'table-class',
             defaultCellStyle: defaultCellStyle,
             entryPoints: [
                 'xxx-0', 'yyy-1'
