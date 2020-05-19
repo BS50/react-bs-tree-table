@@ -72,6 +72,9 @@ export default class App extends Component {
                     },
                     'birthday': {
                         value: '03.09.1971'
+                    },
+                    'tr-el': {
+                        class: 'tr-class'
                     }
                 }
             ],

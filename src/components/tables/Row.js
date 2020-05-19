@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import Cell from './Cell'
+import {getClass} from './Style'
 
 class Row extends Component {
     componentDidMount() {
@@ -26,8 +27,12 @@ class Row extends Component {
             }
         })
         if (rowDataInfo.filtered) {
+            let className = ''
+            if (rowData['tr-el'] !== undefined && rowData['tr-el'].class !== undefined) {
+                className = getClass(rowData['tr-el'].class, this.props)
+            }
             return (
-                <tr key={rowData.id}>
+                <tr key={rowData.id} className={className}>
                     {row}
                 </tr>
             )

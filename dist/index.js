@@ -1918,9 +1918,13 @@ var Row = function (_Component) {
                 }
             });
             if (rowDataInfo.filtered) {
+                var className = '';
+                if (rowData['tr-el'] !== undefined && rowData['tr-el'].class !== undefined) {
+                    className = getClass(rowData['tr-el'].class, _this.props);
+                }
                 return React__default.createElement(
                     'tr',
-                    { key: rowData.id },
+                    { key: rowData.id, className: className },
                     row
                 );
             } else {
