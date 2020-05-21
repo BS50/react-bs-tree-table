@@ -1,3 +1,5 @@
+import React from 'react'
+
 export const getStyle = (styleFunc, props) => {
     if (styleFunc) {
         return styleFunc(props)
@@ -28,17 +30,21 @@ export const getClass = (cellClassFunc, props) => {
     return ''
 }
 
-export const renderHeaderCell = (renderFunc, tableData, headerInfo) => {
-    if (renderFunc) {
-        return renderFunc(tableData.tableData, headerInfo)
+export const renderHeaderCell = (Renderer, funcRenderer, tableData, headerInfo) => {
+    if (Renderer) {
+        return <Renderer tableData={tableData.tableData} headerInfo={headerInfo} />
+    } else if (funcRenderer) {
+        return funcRenderer(tableData.tableData, headerInfo)
     }
     return headerInfo.title
 }
 
-export const renderCell = (renderFunc, tableData, rowData, columnId) => {
+export const renderCell = (Renderer, funcRenderer, tableData, rowData, columnId) => {
     const cellInfo = rowData[columnId]
-    if (renderFunc) {
-        return renderFunc(tableData.tableData, rowData, columnId)
+    if (Renderer) {
+        return <Renderer tableData={tableData.tableData} rowData={rowData} columnId={columnId} />
+    } else if (funcRenderer) {
+        return funcRenderer(tableData.tableData, rowData, columnId)
     }
     return cellInfo.value
 }

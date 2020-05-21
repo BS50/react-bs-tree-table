@@ -9,3 +9,9 @@ export const yearFilterFunc = (tableData, rowData, columnId) => {
     var cellInfo = rowData[columnId]
     return [{value: cellInfo.value.year, renderedValue: cellInfo.value.year}]
 }
+
+export const plainFuncHeaderRenderer = (tableData, headerInfo) => {
+    return <div style={{backgroundColor: 'red'}}>
+        {headerInfo.title}
+    </div>
+}

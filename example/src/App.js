@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 
 // import ExampleComponent from 'react-bs-tree-table'
 // import ExampleComponent from 'react-bs-tree-table'
-import {ExampleComponent1, ExampleComponent, Table} from 'react-bs-tree-table'
-import {renderYearCell, yearFilterFunc} from './TableRenderers'
+import {Table} from 'react-bs-tree-table'
+import {renderYearCell, yearFilterFunc, plainFuncHeaderRenderer} from './TableRenderers'
+import FuncComponentHeaderRenderer from './renderers/FuncComponentHeaderRenderer'
 import {firstColumnStyle, defaultCellStyle, exampleClass, defaultColumnClass, nameColumnClass} from './TableStyles'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -15,7 +16,8 @@ export default class App extends Component {
                     field: 'firstname',
                     title: 'Фамилия',
                     grouped: true,
-                    class: 'name-column-class'
+                    class: 'name-column-class',
+                    funcRenderer: plainFuncHeaderRenderer
                 },
                 {
                     field: 'secondname',
@@ -25,7 +27,8 @@ export default class App extends Component {
                 {
                     field: 'birthday',
                     title: 'Дата рождения',
-                    class: 'default-column-class'
+                    class: 'default-column-class',
+                    renderer: FuncComponentHeaderRenderer
                 }
             ],
             data: [
@@ -49,7 +52,12 @@ export default class App extends Component {
                         value: 'Петров'
                     },
                     'secondname': {
-                        value: 'Игорь'
+                        value: 'Игорь',
+                        render: ({rowData, columnId}) => {
+                            return <div style={{color: 'green'}}>
+                                {rowData[columnId].value}
+                            </div>
+                        }
                     },
                     'childList': ['2', '3']
                 },
@@ -119,7 +127,7 @@ export default class App extends Component {
                             month: '04',
                             year: '1956'
                         },
-                        render: renderYearCell,
+                        funcRenderer: renderYearCell,
                         filterFunc: yearFilterFunc
                     }
                 },
@@ -137,7 +145,7 @@ export default class App extends Component {
                             month: '09',
                             year: '1956'
                         },
-                        render: renderYearCell,
+                        funcRenderer: renderYearCell,
                         filterFunc: yearFilterFunc
                     }
                 },
@@ -164,7 +172,7 @@ export default class App extends Component {
                             month: '09',
                             year: '1971'
                         },
-                        render: renderYearCell,
+                        funcRenderer: renderYearCell,
                         filterFunc: yearFilterFunc
                     }
                 }

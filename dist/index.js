@@ -159,18 +159,28 @@ var getClass = function getClass(cellClassFunc, props) {
     return '';
 };
 
-var renderHeaderCell = function renderHeaderCell(renderFunc, tableData, headerInfo) {
-    if (renderFunc) {
-        return renderFunc(tableData.tableData, headerInfo);
+var renderHeaderCell = function renderHeaderCell(Renderer, funcRenderer, tableData, headerInfo) {
+    if (Renderer) {
+        return React__default.createElement(Renderer, { tableData: tableData.tableData, headerInfo: headerInfo });
+    } else if (funcRenderer) {
+        return funcRenderer(tableData.tableData, headerInfo);
     }
     return headerInfo.title;
 };
 
-var renderCell = function renderCell(renderFunc, tableData, rowData, columnId) {
+var renderCell = function renderCell(Renderer, funcRenderer, tableData, rowData, columnId) {
     var cellInfo = rowData[columnId];
-    if (renderFunc) {
-        return renderFunc(tableData.tableData, rowData, columnId);
+    if (Renderer) {
+        console.log("FUNC COMP CELL");
+        console.log(cellInfo.value);
+        return React__default.createElement(Renderer, { tableData: tableData.tableData, rowData: rowData, columnId: columnId });
+    } else if (funcRenderer) {
+        console.log("FUNC CELL");
+        console.log(cellInfo.value);
+        return funcRenderer(tableData.tableData, rowData, columnId);
     }
+    console.log("SIMPLE CELL");
+    console.log(cellInfo.value);
     return cellInfo.value;
 };
 
@@ -1701,7 +1711,7 @@ var HeaderCell = function (_Component) {
                         style: getStyle(this.props.columnInfo.style, this.props), key: this.props.columnInfo.field,
                         className: getClass(this.props.columnInfo.class, this.props)
                     },
-                    renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo),
+                    renderHeaderCell(this.props.columnInfo.renderer, this.props.columnInfo.funcRenderer, this.props.serviceTableData, this.props.columnInfo),
                     this.getFilterIcon()
                 );
             }
@@ -1857,7 +1867,7 @@ var Cell = function (_Component) {
                             className: className
                         },
                         this.getGroupButton(),
-                        renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
+                        renderCell(cellInfo.render, cellInfo.funcRenderer, this.props.serviceTableData, rowData, columnId)
                     );
                 } else {
                     return React__default.createElement(
@@ -1866,7 +1876,7 @@ var Cell = function (_Component) {
                             style: style,
                             className: className
                         },
-                        renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)
+                        renderCell(cellInfo.render, cellInfo.funcRenderer, this.props.serviceTableData, rowData, columnId)
                     );
                 }
             }

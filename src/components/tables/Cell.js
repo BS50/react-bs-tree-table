@@ -56,14 +56,14 @@ class Cell extends Component {
                     className={className}
                 >
                     {this.getGroupButton()}
-                    {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
+                    {renderCell(cellInfo.render, cellInfo.funcRenderer, this.props.serviceTableData, rowData, columnId)}
                 </td>
             } else {
                 return <td
                     style={style}
                     className={className}
                 >
-                    {renderCell(cellInfo.render, this.props.serviceTableData, rowData, columnId)}
+                    {renderCell(cellInfo.render, cellInfo.funcRenderer, this.props.serviceTableData, rowData, columnId)}
                 </td>
             }
         }

@@ -37,7 +37,11 @@ class HeaderCell extends Component {
                     style={getStyle(this.props.columnInfo.style, this.props)} key={this.props.columnInfo.field}
                     className={getClass(this.props.columnInfo.class, this.props)}
                 >
-                    {renderHeaderCell(this.props.columnInfo.renderer, this.props.serviceTableData, this.props.columnInfo)}
+                    {renderHeaderCell(
+                        this.props.columnInfo.renderer,
+                        this.props.columnInfo.funcRenderer,
+                        this.props.serviceTableData,
+                        this.props.columnInfo)}
                     {this.getFilterIcon()}
                 </th>
             )
