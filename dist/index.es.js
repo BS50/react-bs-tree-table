@@ -2,128 +2,6 @@ import React, { Component, createElement } from 'react';
 import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 
-function styleInject(css, ref) {
-  if ( ref === void 0 ) ref = {};
-  var insertAt = ref.insertAt;
-
-  if (!css || typeof document === 'undefined') { return; }
-
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var style = document.createElement('style');
-  style.type = 'text/css';
-
-  if (insertAt === 'top') {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-var css = "/* add css styles here (optional) */\n\n\n\n.styles_test__32Qsm {\n  display: inline-block;\n  margin: 2em auto;\n  font-size: 2em;\n}\n\n.styles_test1__3q7XI {\n    border: 2px solid #7df756;\n}\n\n.styles_filterButton__3xfyW {\n    float: right;\n}\n\n.styles_transparentButton__2sW-M {\n    background-color: Transparent;\n    background-repeat:no-repeat;\n    border: none;\n}\n\n.styles_activeFilter__1xMkD {\n    color: #009f13;\n}\n.styles_tableContainer__fjLYp {\n    position: static;\n}\n";
-var styles = { "test": "styles_test__32Qsm", "test1": "styles_test1__3q7XI", "filterButton": "styles_filterButton__3xfyW", "transparentButton": "styles_transparentButton__2sW-M", "activeFilter": "styles_activeFilter__1xMkD", "tableContainer": "styles_tableContainer__fjLYp" };
-styleInject(css);
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var ExampleComponent1 = function (_Component) {
-  inherits(ExampleComponent1, _Component);
-
-  function ExampleComponent1() {
-    classCallCheck(this, ExampleComponent1);
-    return possibleConstructorReturn(this, (ExampleComponent1.__proto__ || Object.getPrototypeOf(ExampleComponent1)).apply(this, arguments));
-  }
-
-  createClass(ExampleComponent1, [{
-    key: 'render',
-    value: function render() {
-      var text = this.props.text;
-
-
-      return React.createElement(
-        'div',
-        { className: [styles.test, styles.test1].join(' ') },
-        'Example11111 Component: ',
-        text
-      );
-    }
-  }]);
-  return ExampleComponent1;
-}(Component);
-
-ExampleComponent1.propTypes = {
-  text: PropTypes.string
-};
-
 var getStyle = function getStyle(styleFunc, props) {
     if (styleFunc) {
         return styleFunc(props);
@@ -164,16 +42,10 @@ var renderHeaderCell = function renderHeaderCell(Renderer, funcRenderer, tableDa
 var renderCell = function renderCell(Renderer, funcRenderer, tableData, rowData, columnId) {
     var cellInfo = rowData[columnId];
     if (Renderer) {
-        console.log("FUNC COMP CELL");
-        console.log(cellInfo.value);
         return React.createElement(Renderer, { tableData: tableData.tableData, rowData: rowData, columnId: columnId });
     } else if (funcRenderer) {
-        console.log("FUNC CELL");
-        console.log(cellInfo.value);
         return funcRenderer(tableData.tableData, rowData, columnId);
     }
-    console.log("SIMPLE CELL");
-    console.log(cellInfo.value);
     return cellInfo.value;
 };
 
@@ -824,14 +696,14 @@ function defineIcons(prefix, icons) {
   }
 }
 
-var styles$1 = namespace.styles,
+var styles = namespace.styles,
     shims = namespace.shims;
 var _byUnicode = {};
 var _byLigature = {};
 var _byOldName = {};
 var build = function build() {
   var lookup = function lookup(reducer) {
-    return reduce(styles$1, function (o, style, prefix) {
+    return reduce(styles, function (o, style, prefix) {
       o[prefix] = reduce(style, reducer, {});
       return o;
     }, {});
@@ -852,7 +724,7 @@ var build = function build() {
     });
     return acc;
   });
-  var hasRegular = 'far' in styles$1;
+  var hasRegular = 'far' in styles;
   _byOldName = reduce(shims, function (acc, shim) {
     var oldName = shim[0];
     var prefix = shim[1];
@@ -871,7 +743,7 @@ var build = function build() {
 };
 build();
 
-var styles$1$1 = namespace.styles;
+var styles$1 = namespace.styles;
 function iconFromMapping(mapping, prefix, iconName) {
   if (mapping && mapping[prefix] && mapping[prefix][iconName]) {
     return {
@@ -1094,7 +966,7 @@ var styles$3 = namespace.styles;
 
 var baseStyles = "svg:not(:root).svg-inline--fa {\n  overflow: visible;\n}\n\n.svg-inline--fa {\n  display: inline-block;\n  font-size: inherit;\n  height: 1em;\n  overflow: visible;\n  vertical-align: -0.125em;\n}\n.svg-inline--fa.fa-lg {\n  vertical-align: -0.225em;\n}\n.svg-inline--fa.fa-w-1 {\n  width: 0.0625em;\n}\n.svg-inline--fa.fa-w-2 {\n  width: 0.125em;\n}\n.svg-inline--fa.fa-w-3 {\n  width: 0.1875em;\n}\n.svg-inline--fa.fa-w-4 {\n  width: 0.25em;\n}\n.svg-inline--fa.fa-w-5 {\n  width: 0.3125em;\n}\n.svg-inline--fa.fa-w-6 {\n  width: 0.375em;\n}\n.svg-inline--fa.fa-w-7 {\n  width: 0.4375em;\n}\n.svg-inline--fa.fa-w-8 {\n  width: 0.5em;\n}\n.svg-inline--fa.fa-w-9 {\n  width: 0.5625em;\n}\n.svg-inline--fa.fa-w-10 {\n  width: 0.625em;\n}\n.svg-inline--fa.fa-w-11 {\n  width: 0.6875em;\n}\n.svg-inline--fa.fa-w-12 {\n  width: 0.75em;\n}\n.svg-inline--fa.fa-w-13 {\n  width: 0.8125em;\n}\n.svg-inline--fa.fa-w-14 {\n  width: 0.875em;\n}\n.svg-inline--fa.fa-w-15 {\n  width: 0.9375em;\n}\n.svg-inline--fa.fa-w-16 {\n  width: 1em;\n}\n.svg-inline--fa.fa-w-17 {\n  width: 1.0625em;\n}\n.svg-inline--fa.fa-w-18 {\n  width: 1.125em;\n}\n.svg-inline--fa.fa-w-19 {\n  width: 1.1875em;\n}\n.svg-inline--fa.fa-w-20 {\n  width: 1.25em;\n}\n.svg-inline--fa.fa-pull-left {\n  margin-right: 0.3em;\n  width: auto;\n}\n.svg-inline--fa.fa-pull-right {\n  margin-left: 0.3em;\n  width: auto;\n}\n.svg-inline--fa.fa-border {\n  height: 1.5em;\n}\n.svg-inline--fa.fa-li {\n  width: 2em;\n}\n.svg-inline--fa.fa-fw {\n  width: 1.25em;\n}\n\n.fa-layers svg.svg-inline--fa {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0;\n}\n\n.fa-layers {\n  display: inline-block;\n  height: 1em;\n  position: relative;\n  text-align: center;\n  vertical-align: -0.125em;\n  width: 1em;\n}\n.fa-layers svg.svg-inline--fa {\n  -webkit-transform-origin: center center;\n          transform-origin: center center;\n}\n\n.fa-layers-counter, .fa-layers-text {\n  display: inline-block;\n  position: absolute;\n  text-align: center;\n}\n\n.fa-layers-text {\n  left: 50%;\n  top: 50%;\n  -webkit-transform: translate(-50%, -50%);\n          transform: translate(-50%, -50%);\n  -webkit-transform-origin: center center;\n          transform-origin: center center;\n}\n\n.fa-layers-counter {\n  background-color: #ff253a;\n  border-radius: 1em;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #fff;\n  height: 1.5em;\n  line-height: 1;\n  max-width: 5em;\n  min-width: 1.5em;\n  overflow: hidden;\n  padding: 0.25em;\n  right: 0;\n  text-overflow: ellipsis;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right;\n}\n\n.fa-layers-bottom-right {\n  bottom: 0;\n  right: 0;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom right;\n          transform-origin: bottom right;\n}\n\n.fa-layers-bottom-left {\n  bottom: 0;\n  left: 0;\n  right: auto;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom left;\n          transform-origin: bottom left;\n}\n\n.fa-layers-top-right {\n  right: 0;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right;\n}\n\n.fa-layers-top-left {\n  left: 0;\n  right: auto;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top left;\n          transform-origin: top left;\n}\n\n.fa-lg {\n  font-size: 1.3333333333em;\n  line-height: 0.75em;\n  vertical-align: -0.0667em;\n}\n\n.fa-xs {\n  font-size: 0.75em;\n}\n\n.fa-sm {\n  font-size: 0.875em;\n}\n\n.fa-1x {\n  font-size: 1em;\n}\n\n.fa-2x {\n  font-size: 2em;\n}\n\n.fa-3x {\n  font-size: 3em;\n}\n\n.fa-4x {\n  font-size: 4em;\n}\n\n.fa-5x {\n  font-size: 5em;\n}\n\n.fa-6x {\n  font-size: 6em;\n}\n\n.fa-7x {\n  font-size: 7em;\n}\n\n.fa-8x {\n  font-size: 8em;\n}\n\n.fa-9x {\n  font-size: 9em;\n}\n\n.fa-10x {\n  font-size: 10em;\n}\n\n.fa-fw {\n  text-align: center;\n  width: 1.25em;\n}\n\n.fa-ul {\n  list-style-type: none;\n  margin-left: 2.5em;\n  padding-left: 0;\n}\n.fa-ul > li {\n  position: relative;\n}\n\n.fa-li {\n  left: -2em;\n  position: absolute;\n  text-align: center;\n  width: 2em;\n  line-height: inherit;\n}\n\n.fa-border {\n  border: solid 0.08em #eee;\n  border-radius: 0.1em;\n  padding: 0.2em 0.25em 0.15em;\n}\n\n.fa-pull-left {\n  float: left;\n}\n\n.fa-pull-right {\n  float: right;\n}\n\n.fa.fa-pull-left,\n.fas.fa-pull-left,\n.far.fa-pull-left,\n.fal.fa-pull-left,\n.fab.fa-pull-left {\n  margin-right: 0.3em;\n}\n.fa.fa-pull-right,\n.fas.fa-pull-right,\n.far.fa-pull-right,\n.fal.fa-pull-right,\n.fab.fa-pull-right {\n  margin-left: 0.3em;\n}\n\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n          animation: fa-spin 2s infinite linear;\n}\n\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n          animation: fa-spin 1s infinite steps(8);\n}\n\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg);\n  }\n}\n\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg);\n  }\n}\n.fa-rotate-90 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)\";\n  -webkit-transform: rotate(90deg);\n          transform: rotate(90deg);\n}\n\n.fa-rotate-180 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)\";\n  -webkit-transform: rotate(180deg);\n          transform: rotate(180deg);\n}\n\n.fa-rotate-270 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)\";\n  -webkit-transform: rotate(270deg);\n          transform: rotate(270deg);\n}\n\n.fa-flip-horizontal {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)\";\n  -webkit-transform: scale(-1, 1);\n          transform: scale(-1, 1);\n}\n\n.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(1, -1);\n          transform: scale(1, -1);\n}\n\n.fa-flip-both, .fa-flip-horizontal.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(-1, -1);\n          transform: scale(-1, -1);\n}\n\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical,\n:root .fa-flip-both {\n  -webkit-filter: none;\n          filter: none;\n}\n\n.fa-stack {\n  display: inline-block;\n  height: 2em;\n  position: relative;\n  width: 2.5em;\n}\n\n.fa-stack-1x,\n.fa-stack-2x {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0;\n}\n\n.svg-inline--fa.fa-stack-1x {\n  height: 1em;\n  width: 1.25em;\n}\n.svg-inline--fa.fa-stack-2x {\n  height: 2em;\n  width: 2.5em;\n}\n\n.fa-inverse {\n  color: #fff;\n}\n\n.sr-only {\n  border: 0;\n  clip: rect(0, 0, 0, 0);\n  height: 1px;\n  margin: -1px;\n  overflow: hidden;\n  padding: 0;\n  position: absolute;\n  width: 1px;\n}\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  clip: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  position: static;\n  width: auto;\n}\n\n.svg-inline--fa .fa-primary {\n  fill: var(--fa-primary-color, currentColor);\n  opacity: 1;\n  opacity: var(--fa-primary-opacity, 1);\n}\n\n.svg-inline--fa .fa-secondary {\n  fill: var(--fa-secondary-color, currentColor);\n  opacity: 0.4;\n  opacity: var(--fa-secondary-opacity, 0.4);\n}\n\n.svg-inline--fa.fa-swap-opacity .fa-primary {\n  opacity: 0.4;\n  opacity: var(--fa-secondary-opacity, 0.4);\n}\n\n.svg-inline--fa.fa-swap-opacity .fa-secondary {\n  opacity: 1;\n  opacity: var(--fa-primary-opacity, 1);\n}\n\n.svg-inline--fa mask .fa-primary,\n.svg-inline--fa mask .fa-secondary {\n  fill: black;\n}\n\n.fad.fa-inverse {\n  color: #fff;\n}";
 
-function css$1 () {
+function css () {
   var dfp = DEFAULT_FAMILY_PREFIX;
   var drc = DEFAULT_REPLACEMENT_CLASS;
   var fp = config.familyPrefix;
@@ -1164,7 +1036,7 @@ function () {
 
 function ensureCss() {
   if (config.autoAddCss && !_cssInserted) {
-    insertCss(css$1());
+    insertCss(css());
 
     _cssInserted = true;
   }
@@ -1281,18 +1153,18 @@ var icon = resolveIcons(function (iconDefinition) {
   });
 });
 
-function _typeof$2(obj) {
+function _typeof$1(obj) {
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof$2 = function (obj) {
+    _typeof$1 = function (obj) {
       return typeof obj;
     };
   } else {
-    _typeof$2 = function (obj) {
+    _typeof$1 = function (obj) {
       return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
     };
   }
 
-  return _typeof$2(obj);
+  return _typeof$1(obj);
 }
 
 function _defineProperty$1(obj, key, value) {
@@ -1527,7 +1399,7 @@ function normalizeIconArgs(icon$$1) {
   } // if the icon is an object and has a prefix and an icon name, return it
 
 
-  if (_typeof$2(icon$$1) === 'object' && icon$$1.prefix && icon$$1.iconName) {
+  if (_typeof$1(icon$$1) === 'object' && icon$$1.prefix && icon$$1.iconName) {
     return icon$$1;
   } // if it's an array with length of two
 
@@ -1656,6 +1528,99 @@ var faTimes = {
   icon: [352, 512, [], "f00d", "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"]
 };
 
+function styleInject(css, ref) {
+  if ( ref === void 0 ) ref = {};
+  var insertAt = ref.insertAt;
+
+  if (!css || typeof document === 'undefined') { return; }
+
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (insertAt === 'top') {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var css$1 = "/* add css styles here (optional) */\n\n\n\n.styles_test__32Qsm {\n  display: inline-block;\n  margin: 2em auto;\n  font-size: 2em;\n}\n\n.styles_test1__3q7XI {\n    border: 2px solid #7df756;\n}\n\n.styles_filterButton__3xfyW {\n    float: right;\n}\n\n.styles_transparentButton__2sW-M {\n    background-color: Transparent;\n    background-repeat:no-repeat;\n    border: none;\n}\n\n.styles_activeFilter__1xMkD {\n    color: #009f13;\n}\n.styles_tableContainer__fjLYp {\n    position: static;\n}\n";
+var styles$4 = { "test": "styles_test__32Qsm", "test1": "styles_test1__3q7XI", "filterButton": "styles_filterButton__3xfyW", "transparentButton": "styles_transparentButton__2sW-M", "activeFilter": "styles_activeFilter__1xMkD", "tableContainer": "styles_tableContainer__fjLYp" };
+styleInject(css$1);
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
 var HeaderCell = function (_Component) {
     inherits(HeaderCell, _Component);
 
@@ -1671,9 +1636,9 @@ var HeaderCell = function (_Component) {
         }
 
         return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = HeaderCell.__proto__ || Object.getPrototypeOf(HeaderCell)).call.apply(_ref, [this].concat(args))), _this), _this.getFilterIcon = function () {
-            var buttonClassName = [styles.filterButton, styles.transparentButton];
+            var buttonClassName = [styles$4.filterButton, styles$4.transparentButton];
             if (_this.props.columnFilter !== undefined && _this.props.columnFilter.filteredValues.length > 0) {
-                buttonClassName.push(styles.activeFilter);
+                buttonClassName.push(styles$4.activeFilter);
             }
             buttonClassName = buttonClassName.join(' ');
 
@@ -2051,7 +2016,7 @@ var ColumnFilter = function (_Component) {
                     ),
                     React.createElement(
                         'button',
-                        { className: styles.transparentButton, onClick: function onClick() {
+                        { className: styles$4.transparentButton, onClick: function onClick() {
                                 _this2.props.closeColumnFilter(_this2.props.columnFilter.columnId);
                             } },
                         React.createElement(FontAwesomeIcon, { icon: faTimes })
@@ -2096,7 +2061,7 @@ var MenuBar = function (_Component) {
                     React.createElement(
                         'button',
                         {
-                            className: styles.transparentButton,
+                            className: styles$4.transparentButton,
                             onClick: function onClick(e) {
                                 _this2.props.toogleColumnVisibilityContainer(e.pageX, e.pageY);
                             }
@@ -2828,7 +2793,7 @@ var Table$1 = function (_Component) {
 
                 return React.createElement(
                     'div',
-                    { className: styles.tableContainer, onClick: function onClick(e) {
+                    { className: styles$4.tableContainer, onClick: function onClick(e) {
                             _this4.onClickInTable(e);
                         } },
                     columnFilters,
@@ -2865,41 +2830,5 @@ Table$1.propTypes = {
     tableData: PropTypes.object.isRequired
 };
 
-// import './components/tables/Table.css'
-
-var ExampleComponent = function (_Component) {
-    inherits(ExampleComponent, _Component);
-
-    function ExampleComponent() {
-        classCallCheck(this, ExampleComponent);
-        return possibleConstructorReturn(this, (ExampleComponent.__proto__ || Object.getPrototypeOf(ExampleComponent)).apply(this, arguments));
-    }
-
-    createClass(ExampleComponent, [{
-        key: 'render',
-        value: function render() {
-            var text = this.props.text;
-
-            return React.createElement(
-                'div',
-                { className: 'test' },
-                React.createElement(
-                    'button',
-                    { className: styles.transparentButton },
-                    'sfsd'
-                ),
-                'Example Component2: ',
-                text,
-                ']'
-            );
-        }
-    }]);
-    return ExampleComponent;
-}(Component);
-
-ExampleComponent.propTypes = {
-    text: PropTypes.string
-};
-
-export { ExampleComponent, ExampleComponent1, Table$1 as Table };
+export { Table$1 as Table };
 //# sourceMappingURL=index.es.js.map
